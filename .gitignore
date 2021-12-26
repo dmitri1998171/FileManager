@@ -1,2 +1,5 @@
-/bin
-/.vscode
+main
+*.o
+TODO.md
+.DS_Store
+text(1).txt
