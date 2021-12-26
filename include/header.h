@@ -21,15 +21,12 @@
 pthread_t tid1, tid2;
 pthread_mutex_t mutex;
 
-char *dir_arr_left[ARR_SIZE];
-char *dir_arr_right[ARR_SIZE];
-char path_left[ARR_SIZE];
-char path_right[ARR_SIZE];
-char *choices_right[ARR_SIZE];
-char *choices_left[ARR_SIZE];
-int size_left, size_right;
-int dir_size_left, dir_size_right;
-int highlight_left, highlight_right;
+char *dir_arr[2][ARR_SIZE];
+char path[2][ARR_SIZE];
+char *choices[2][ARR_SIZE];
+int size[2];
+int dir_size[2];
+int highlight[2];
 WINDOW *windows[2];
 
 struct pthread_struct {

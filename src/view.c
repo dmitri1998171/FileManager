@@ -163,25 +163,25 @@ void displayFunc(){
     init_pair(1, COLOR_RED, COLOR_BLACK);
 
     chdir(".");
-    getcwd(path_left, ARR_SIZE);
-    getcwd(path_right, ARR_SIZE);
+    getcwd(path[0], ARR_SIZE);
+    getcwd(path[1], ARR_SIZE);
 
-    scaner(path_left, choices_left, dir_arr_left, 
-            &size_left, &dir_size_left);
-    scaner(path_right, choices_right, dir_arr_right, 
-            &size_right, &dir_size_right);
+    scaner(path[0], choices[1], dir_arr[0], 
+            &size[0], &dir_size[0]);
+    scaner(path[1], choices[0], dir_arr[1], 
+            &size[1], &dir_size[1]);
     printf("\n");
 
     char *title="---------- File Manager ----------";
     print_title(stdscr, 1, 0, COLS, title, COLOR_PAIR(1));
 	mvprintw(LINES - 1, 1, "Tab - Switch panel  F1 - Quit  F5 - Copy");
 
-    interfaceFunc(&windows[0], path_left, &size_left, 0);
-    interfaceFunc(&windows[1], path_right, &size_right, COLS/2);
+    interfaceFunc(&windows[0], path[0], &size[0], 0);
+    interfaceFunc(&windows[1], path[1], &size[1], COLS/2);
     refresh();
 
-	print_menu(windows[0], highlight_left, choices_left, &size_left);
-    print_menu(windows[1], highlight_right, choices_right, &size_right);
+	print_menu(windows[0], highlight[0], choices[1], &size[0]);
+    print_menu(windows[1], highlight[1], choices[0], &size[1]);
 }
 
 void reloadWinFunc(WINDOW *win, char *choices[], char *path, char *dir_arr[], int *highlight, int *size, int *dir_size){
