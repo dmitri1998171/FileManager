@@ -23,12 +23,12 @@ void enterFunc(struct Arg_struct *params) {
         displayFunc(params);
     }
     refresh();
-    wrefresh(windows[0]);
-    wrefresh(windows[1]);
+    // wrefresh(windows[0]);
+    // wrefresh(windows[1]);
 }
 
 void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab) {
-    int input = wgetch(windows[1]);
+    int input = wgetch(params->window);
 
     switch(input) {
         case KEY_DOWN:
@@ -76,11 +76,10 @@ void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab) {
         case 10:
             enterFunc(params);
             break;
-
     }
 }
 
-void scaner(WINDOW *window, struct Arg_struct *params) {
+void scaner(struct Arg_struct *params) {
 	int counter = 0, dir_counter = 0;
 	struct dirent *dir_struct_t;
     DIR *dir;
@@ -91,38 +90,45 @@ void scaner(WINDOW *window, struct Arg_struct *params) {
         exit(1); 
     }
 
-	int x = 2, y = 3;
-	box(window, 0, 0);
-
 	while((dir_struct_t = readdir(dir))) {
 		if(strcmp(dir_struct_t->d_name, ".") == 0) {
 			continue;
 	    }
 
         strcpy(&params->choices[counter], dir_struct_t->d_name);
+        LOG_CHAR(&params->choices[counter], 0)
 
 		if(dir_struct_t->d_type == DT_DIR) {
 			strcpy(&params->dir_arr[dir_counter], dir_struct_t->d_name);
 			dir_counter++;
-		} 
-
-		// High light the present choice 
-		if(params->highlight == counter + 1) { 
-            wattron(window, A_REVERSE); 
-			mvwprintw(window, y, x, "%s", &params->choices[counter]);
-            wattroff(window, A_REVERSE);
 		}
-		else
-			mvwprintw(window, y, x, "%s", &params->choices[counter]);
-        
-		y++;
+
         counter++;
 	}
     
     params->size = counter;
     params->dir_size = dir_counter;
 	closedir(dir);
-	wrefresh(window);
+}
+
+void printList(struct Arg_struct *params) {
+	int x = 2, y = 3;
+	box(params->window, 0, 0);
+
+    for (int i = 0; i < params->size; i++) {
+		// High light the present choice 
+		if(params->highlight == i + 1) { 
+            wattron(params->window, A_REVERSE); 
+			mvwprintw(params->window, y, x, "%s", &params->choices[i]);
+            wattroff(params->window, A_REVERSE);
+		}
+		else
+			mvwprintw(params->window, y, x, "%s", &params->choices[i]);
+        
+		y++;
+    }
+
+	wrefresh(params->window);
 }
 
 void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w, int lt_x, int rt_x) {
@@ -152,16 +158,16 @@ void printTitle(WINDOW *win, int starty, int startx, int width, char string[], c
 	refresh();
 }
 
-void interfaceFunc(WINDOW **win, struct Arg_struct *params, int x) {
+void interfaceFunc(struct Arg_struct *params, int x) {
     /* Создаем окно */
-    *win = newwin(LINES-4, COLS/2, 3, x);
-    keypad(*win, TRUE);
+    params->window = newwin(LINES-4, COLS/2, 3, x);
+    keypad(params->window, TRUE);
 
     /* Рисуем границы */
-    printTitle(*win, 1, 0, COLS/2, params->path, COLOR_PAIR(1));
-    boxTitle(*win, 0, 0, 2, 1, COLS/2-2, 0, COLS/2-1);
+    printTitle(params->window, 1, 0, COLS/2, params->path, COLOR_PAIR(1));
+    boxTitle(params->window, 0, 0, 2, 1, COLS/2-2, 0, COLS/2-1);
 
-	wrefresh(*win);
+	wrefresh(params->window);
 }
 
 void displayFunc(struct Arg_struct *params) {
@@ -177,8 +183,8 @@ void displayFunc(struct Arg_struct *params) {
     printTitle(stdscr, 1, 0, COLS, title, COLOR_PAIR(1));
 	mvprintw(LINES - 1, 1, "Tab - Switch panel  F1 - Quit  F5 - Copy");
 
-    interfaceFunc(&windows[0], &params[0], 0);
-    interfaceFunc(&windows[1], &params[1], COLS/2);
+    interfaceFunc(&params[0], 0);
+    interfaceFunc(&params[1], COLS/2);
     refresh();
 }
 

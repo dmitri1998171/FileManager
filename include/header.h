@@ -15,13 +15,28 @@
 #include <sys/wait.h>
 #include <ncurses.h>
 
+// ##############################
+#define DEBUG 1
+
+#if DEBUG
+    FILE* fdw;
+
+	#define LOG_NUM(x) fprintf(fdw, "%s: %d\n", #x, x);
+	#define LOG_CHAR(x, switcher)   	    \
+		( (switcher) == 0 ? 				\
+		(fprintf(fdw, "%s\n", x)) :    		\
+		(fprintf(fdw, "%s: %s\n", #x, x)) ); 
+#else
+	#define LOG(x) 
+#endif
+// ##############################
+
 #define ARR_SIZE 1024
 #define BUFF_SIZE 5    // кол-во байт, считываемых за раз 
 
 pthread_t tid1, tid2;
 pthread_mutex_t mutex;
 
-WINDOW *windows[2];
 
 struct Arg_struct {
         char dir_arr[ARR_SIZE];
@@ -30,6 +45,7 @@ struct Arg_struct {
         int size;
         int dir_size;
         int highlight;
+        WINDOW *window;
 };
 
 struct pthread_struct {
@@ -43,10 +59,11 @@ void enterFunc(struct Arg_struct *params);
 void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab);
 // void switchFunc(WINDOW *win, char *path, char *dir_arr[], int *dir_size, char *choices[], int *c, int *highlight, int *size, int *cycle, int *win_tab);
 
-void scaner(WINDOW *window, struct Arg_struct *params);
+void scaner(struct Arg_struct *params);
+void printList(struct Arg_struct *params);
 void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w, int lt_x, int rt_x);
 void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color);
-void interfaceFunc(WINDOW **win, struct Arg_struct *params, int x);
+void interfaceFunc(struct Arg_struct *params, int x);
 void displayFunc(struct Arg_struct *params);
 void reloadWinFunc(WINDOW *win, char *choices[], char *path, char *dir_arr[], int *highlight, int *size, int *dir_size);
 

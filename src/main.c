@@ -1,6 +1,12 @@
 #include "../include/header.h"
 
+
+
 int main() {	
+	#if DEBUG
+		fdw = fopen("log.log", "w");
+	#endif
+
 	int cycle = 1, win_tab = 0;
 	struct Arg_struct params[2];
 
@@ -14,31 +20,54 @@ int main() {
 	pthread_mutex_init(&mutex, NULL);
 	displayFunc(params);
 
-	scaner(windows[0], &params[0]);
-	scaner(windows[1], &params[1]);
+	scaner(&params[0]);
+	// scaner(&params[1]);
 
-//////////////////////////////////////////////////////////////////////
+	// printList(&params[0]);
 
+// 
+	int x = 2, y = 3;
+	box(params[0].window, 0, 0);
+
+	LOG_CHAR("\n", 0)
+
+    for (int i = 0; i < params[0].size; i++) {
+		// High light the present choice 
+		if(params[0].highlight == i + 1) { 
+            wattron(params[0].window, A_REVERSE); 
+			mvwprintw(params[0].window, y, x, "%s", &params[0].choices[i]);
+            wattroff(params[0].window, A_REVERSE);
+		}
+		else
+			mvwprintw(params[0].window, y, x, "%s", &params[0].choices[i]);
+        
+		LOG_CHAR(&params[0].choices[i], 0)
+		y++;
+    }
+
+	wrefresh(params[0].window);
+// 
+	#if DEBUG
+		fclose(fdw);
+	#endif
 
 	while(cycle) {
 		/* переключение между окнами */
 		if(!win_tab) {
-				// c = wgetch(windows[0]); 
-				switchFunc(&params[0], &cycle, &win_tab);
-				// printMenu(windows[0], &params[0]);
-				scaner(windows[0], &params[0]);
+			switchFunc(&params[0], &cycle, &win_tab);
+			// printMenu(windows[0], &params[0]);
+			// printList(&params[0]);
 		}
 
 		if(win_tab) {
-				// switchFunc(windows[1], path[1], dir_arr[1], &dir_size[1], choices[0], &c, &highlight[1], &size[1], &cycle, &win_tab);
-				switchFunc(&params[1], &cycle, &win_tab);
-				// printMenu(windows[1], &params[1]);
+			switchFunc(&params[1], &cycle, &win_tab);
+			// printMenu(windows[1], &params[1]);
 		}
 
 		// switchFunc(&params[win_tab], &cycle, &win_tab);
 		// printMenu(windows[win_tab], &params[win_tab]);
-	}	
-	getch();
+	}
+
 	pthread_mutex_destroy(&mutex);
 	endwin();
 	return 0;
