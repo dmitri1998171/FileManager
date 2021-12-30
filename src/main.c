@@ -15,13 +15,13 @@ int main() {
 	while(cycle) {
 		/* переключение между окнами */
 		if(!win_tab) {		// Левое окно
-			switchFunc(&params[0], &cycle, &win_tab);
 			printList(&params[0]);
+			switchFunc(&params[0], &cycle, &win_tab);
 		}
 
 		if(win_tab) {		// Правое окно
-			switchFunc(&params[1], &cycle, &win_tab);
 			printList(&params[1]);
+			switchFunc(&params[1], &cycle, &win_tab);
 		}
 	}
 

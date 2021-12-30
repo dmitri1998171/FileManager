@@ -61,7 +61,7 @@ void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int lin
 void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color);
 void createSubwindow(struct Arg_struct *params, int x);
 void displayFunc(struct Arg_struct *params);
-void reloadWinFunc(struct Arg_struct *params);
+void updateSubwindow(struct Arg_struct *params);
 void *progressBar(void *param);
 
 // controller.c

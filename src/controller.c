@@ -7,7 +7,7 @@ void enterFunc(struct Arg_struct *params) {
         // Переходим в директорию
         if(!strcmp(params->choices[params->highlight-1], params->dir_arr[i])) {
             chdir(params->choices[params->highlight-1]);
-            reloadWinFunc(params);
+            updateSubwindow(params);
 
             params->highlight = 1;
             check += 1;   
@@ -57,17 +57,17 @@ void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab) {
             break;
 
         case KEY_F(5):
-            strcpy(pthreadStruct.filename, params->choices[params->highlight-1]); 
-            strcpy(pthreadStruct.pBarName, "Copy: "); 
+            pthreadStruct.filename = params->choices[params->highlight - 1];
+            pthreadStruct.pBarName = "Copy: "; 
 
-            pthread_create(&tid1, NULL, copyFunc, params->choices[params->highlight-1]);
+            pthread_create(&tid1, NULL, copyFunc, params->choices[params->highlight - 1]);
             pthread_create(&tid2, NULL, progressBar, &pthreadStruct);
 
             pthread_join(tid1, NULL);
             pthread_join(tid2, NULL);
 
-            reloadWinFunc(&params[0]);
-            reloadWinFunc(&params[1]);
+            updateSubwindow(&params[0]);
+            updateSubwindow(&params[1]);
 
             break;
 

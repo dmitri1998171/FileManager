@@ -1,5 +1,7 @@
 #include "../include/header.h"
 
+#define BORDER 2
+
 void printList(struct Arg_struct *params) {
 	int x = 2, y = 3;
 	box(params->window, 0, 0);
@@ -72,27 +74,26 @@ void displayFunc(struct Arg_struct *params) {
     printTitle(stdscr, 1, 0, COLS, title, COLOR_PAIR(1));
 	mvprintw(LINES - 1, 1, "Tab - Switch panel  F1 - Quit  F5 - Copy");
 
-    for (int i = 0; i < 2; i++) {
-		getcwd(params[i].path, ARR_SIZE);		// Получ. путь
-    	
-        if(!i)
-            createSubwindow(&params[0], 0);
-        else
-            createSubwindow(&params[1], COLS/2);
+    params[0].window = newwin(LINES-4, COLS/2, 3, 0);         // Левое окно
+    params[1].window = newwin(LINES-4, COLS/2, 3, COLS/2);    // Правое окно
 
+    for (int i = 0; i < 2; i++) {
+        keypad(params[i].window, TRUE);
 		params[i].highlight = 1;
-		scaner(&params[i]);						// Сканируем директорию
-		printList(&params[i]);					// Выводим на экран
+        updateSubwindow(&params[i]);
 	}
 }
 
-inline void reloadWinFunc(struct Arg_struct *params) {
-    getcwd(params->path, ARR_SIZE);
-    wclear(params->window);
-    scaner(params);
+inline void updateSubwindow(struct Arg_struct *params) {
+    getcwd(params->path, ARR_SIZE);         // Получ. путь
+    wclear(params->window);                 // Очищ. окно
+    scaner(params);                         // Сканируем директорию
+    printList(params);	                    // Выводим на экран
     
     printTitle(params->window, 1, 0, COLS/2, params->path, COLOR_PAIR(1));
     boxTitle(params->window, 0, 0, 2, 1, COLS/2-2, 0, COLS/2-1);
+
+    wrefresh(params->window);
 }
 
 void *progressBar(void *param) {
@@ -109,21 +110,28 @@ void *progressBar(void *param) {
     mycopywin = newwin(h, w, (LINES/2) - (h / 2), (COLS/2) - (w / 2));
     box(mycopywin, 0, 0);
 
+    // Создаем окно, устан. заголовок
     wattron(mycopywin, COLOR_PAIR(1));
-    mvwprintw(mycopywin, h-5, 2, threadStruct->pBarName);
+    mvwprintw(mycopywin, h - 5, BORDER, threadStruct->pBarName);
     wattroff(mycopywin, COLOR_PAIR(1));
-    mvwprintw(mycopywin, h-5, 8, threadStruct->filename);
+    mvwprintw(mycopywin, h - 5, BORDER * 4, threadStruct->filename);
 
-    mysubwin = derwin(mycopywin, 3, w - 2, 2, 1);
-    box(mysubwin, 0,0);
+    mysubwin = derwin(mycopywin, 3, w - BORDER, BORDER, 1);
+    box(mysubwin, 0, 0);
 
+    // Полоска загрузки
     wattroff(mycopywin, COLOR_PAIR(1));
-    for(int n = 0; n < w; n++) {
-        mvwaddch(mycopywin, h - 3, n + 2, '#');
-        mvwprintw(mycopywin, h - 5, strlen(threadStruct->filename) + 10, "%d%%", (n * 2) + 6);
+    for(int i = 0; i < w; i++) {
+        mvwprintw(mycopywin, h - 5, strlen(threadStruct->filename) + 10, "%d%%", (i * 2) + BORDER);  // Проценты
+        
+        if(i < w - (BORDER * 2))
+            mvwaddch(mycopywin, h - 3, i + BORDER, '#');         // Полоска
+        
         wrefresh(mycopywin);
-        usleep(100000);
+        usleep(10000);
     }
+
+    getch();
 
     delwin(mysubwin);
     delwin(mycopywin);
