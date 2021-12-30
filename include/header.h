@@ -37,11 +37,10 @@
 pthread_t tid1, tid2;
 pthread_mutex_t mutex;
 
-
 struct Arg_struct {
-        char dir_arr[ARR_SIZE];
+        char *dir_arr[ARR_SIZE];
+        char *choices[ARR_SIZE];
         char path[ARR_SIZE];
-        char choices[ARR_SIZE];
         int size;
         int dir_size;
         int highlight;
@@ -53,22 +52,23 @@ struct pthread_struct {
     char *pBarName;
 }pthreadStruct;
 
-void enterFunc(struct Arg_struct *params);
-// void enterFunc(WINDOW *win, char *choices[], char *path, char *dir_arr[], int *highlight, int *size, int *dir_size);
-
-void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab);
-// void switchFunc(WINDOW *win, char *path, char *dir_arr[], int *dir_size, char *choices[], int *c, int *highlight, int *size, int *cycle, int *win_tab);
-
+// model.c
 void scaner(struct Arg_struct *params);
+
+// view.c
 void printList(struct Arg_struct *params);
 void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w, int lt_x, int rt_x);
 void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color);
-void interfaceFunc(struct Arg_struct *params, int x);
+void createSubwindow(struct Arg_struct *params, int x);
 void displayFunc(struct Arg_struct *params);
 void reloadWinFunc(WINDOW *win, char *choices[], char *path, char *dir_arr[], int *highlight, int *size, int *dir_size);
-
 void *progressBar(void *param);
 
+// controller.c
+void enterFunc(struct Arg_struct *params);
+void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab);
+
+// copy.c
 void renameFunc(char path_r[], char path_w[]);
 void *copyFunc(void *param);
 
