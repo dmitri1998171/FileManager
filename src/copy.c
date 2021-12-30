@@ -1,6 +1,6 @@
 #include "../include/header.h"
 
-void renameFunc(char path_r[], char path_w[]){
+void renameFunc(char path_r[], char path_w[]) {
     char name[255];
     char ext[5];
     
@@ -12,14 +12,14 @@ void renameFunc(char path_r[], char path_w[]){
     strcpy(path_w, name);
 }
 
-void* copyFunc(void *param){
-    char *path = (char*) param;
+void* copyFunc(void *param) {
     char path_r[ARR_SIZE];
     char path_w[ARR_SIZE];
     char *buf[BUFF_SIZE];
     int fdr, fdw, ret;
 
     pthread_mutex_lock(&mutex);
+    char *path = (char*) param;
     strcpy(path_r, path);
     pthread_mutex_unlock(&mutex);
 
@@ -28,7 +28,7 @@ void* copyFunc(void *param){
     fdr = open(path_r, O_RDONLY);
     fdw = open(path_w, O_CREAT | O_WRONLY, S_IRWXU);
 
-    while((ret = read(fdr, &buf, BUFF_SIZE)) != 0){
+    while((ret = read(fdr, &buf, BUFF_SIZE)) != 0) {
         if(ret == -1) 
             perror("Read error");
 

@@ -1,6 +1,6 @@
 #include "../include/header.h"
 
-void *progressBar(void *param){
+void *progressBar(void *param) {
     int h=6, w=50;
     WINDOW *mycopywin;
     WINDOW *mysubwin;
@@ -23,7 +23,7 @@ void *progressBar(void *param){
     box(mysubwin, 0,0);
 
     wattroff(mycopywin, COLOR_PAIR(1));
-    for(int n = 0; n < w; n++){
+    for(int n = 0; n < w; n++) {
         mvwaddch(mycopywin, h-3, n+2, '#');
         mvwprintw(mycopywin, h-5, strlen(threadStruct->filename)+10, "%d%%", (n*2)+6);
         wrefresh(mycopywin);

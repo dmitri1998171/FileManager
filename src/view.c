@@ -1,126 +1,136 @@
 #include "../include/header.h"
 
-void print_menu(WINDOW *menu_win, int highlight, char *choices[], int *size){
-	int i, x = 2, y = 3;
-
-	box(menu_win, 0, 0);
-	for(i = 0; i < *size; ++i)
-	{	if(highlight == i + 1) /* High light the present choice */
-		{	wattron(menu_win, A_REVERSE); 
-			mvwprintw(menu_win, y, x, "%s", choices[i]);
-			wattroff(menu_win, A_REVERSE);
-		}
-		else
-			mvwprintw(menu_win, y, x, "%s", choices[i]);
-		++y;
-	}
-	wrefresh(menu_win);
-}
-
-void enterFunc(WINDOW *win, char *choices[], char *path, char *dir_arr[], int *highlight, int *size, int *dir_size){   
-
+void enterFunc(struct Arg_struct *params) {   
     int check = 0;
-    for(int i=0; i < *dir_size; i++){
-        if(strcmp(choices[*highlight-1], dir_arr[i]) == 0){
-            chdir(choices[*highlight-1]);
+    for(int i=0; i < params->dir_size; i++) {
+        if(strcmp(&params->choices[params->highlight-1], &params->dir_arr[i]) == 0) {
+            chdir(&params->choices[params->highlight-1]);
             
-            reloadWinFunc(win, choices, path, dir_arr, highlight, size, dir_size);
+            // reloadWinFunc(win, choices, path, dir_arr, highlight, size, dir_size);
 
-            *highlight = 1;
+            params->highlight = 1;
             check +=1;   
         }
     }
-    if(check == 0){
+    if(check == 0) {
         pid_t pid = fork();
-        if(pid == 0){
+        if(pid == 0) {
             endwin();
-            execl(choices[*highlight-1], choices[*highlight-1], NULL);
+            execl(&params->choices[params->highlight-1], &params->choices[params->highlight-1], NULL);
             exit(0);
         }
         wait(&pid);
-        displayFunc();
+        displayFunc(params);
     }
     refresh();
     wrefresh(windows[0]);
     wrefresh(windows[1]);
 }
 
-void switchFunc(WINDOW *win, char *path, char *dir_arr[], int *dir_size, char *choices[], int *c, int *highlight, int *size, int *cycle, int *win_tab){
-    switch(*c){
+void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab) {
+    int input = wgetch(windows[1]);
+
+    switch(input) {
         case KEY_DOWN:
-            if(highlight == size)
-                *highlight = 1;
+            if(params->highlight == params->size)
+                params->highlight = 1;
             else 
-                ++*highlight;  
+                ++params->highlight;  
+            
             break;
+
         case KEY_UP:
-            if(*highlight == 1)
-                highlight = size;
+            if(params->highlight == 1) {
+                params->highlight = params->size;
+            }
             else
-                --*highlight;
+                --params->highlight;
             break;
 
         case KEY_F(1):
             *cycle = 0;
             break;
+
         case KEY_F(5):
-            strcpy(pthreadStruct.filename, choices[*highlight-1]); 
+            strcpy(pthreadStruct.filename, &params->choices[params->highlight-1]); 
             strcpy(pthreadStruct.pBarName, "Copy: "); 
 
-            pthread_create(&tid1, NULL, copyFunc, choices[*highlight-1]);
-            pthread_create(&tid2, NULL, progressBar, &pthreadStruct);
+            // pthread_create(&tid1, NULL, copyFunc, &params->choices[params->highlight-1]);
+            // pthread_create(&tid2, NULL, progressBar, &pthreadStruct);
 
-            pthread_join(tid1, NULL);
-            pthread_join(tid2, NULL);
+            // pthread_join(tid1, NULL);
+            // pthread_join(tid2, NULL);
 
-            reloadWinFunc(windows[0], choices, path, dir_arr, highlight, size, dir_size);
+            // reloadWinFunc(windows[0], choices, path, dir_arr, highlight, size, dir_size);
             // reloadWinFunc(windows[1], choices, path, dir_arr, highlight, size, dir_size);
 
             break;
 
         case '\t':
             *win_tab += 1;
-            if(*win_tab > 1) *win_tab = 0;
+            if(*win_tab > 1) 
+                *win_tab = 0;
+            
             break;
+
         case 10:
-            enterFunc(win, choices, path, 
-            dir_arr, highlight, size, dir_size);
+            enterFunc(params);
             break;
 
     }
 }
 
-void scaner(char path[], char *choices[], char *dir_arr[], int *size, int *dir_size){
-	int i=0, f=0;
-	struct dirent *dir;
-    DIR *d;
+void scaner(WINDOW *window, struct Arg_struct *params) {
+	int counter = 0, dir_counter = 0;
+	struct dirent *dir_struct_t;
+    DIR *dir;
 
-	d = opendir(path);
-	if( d == NULL ){ perror("opendir"); exit(1); }
+	dir = opendir(params->path);
+	if(dir == NULL) { 
+        perror("opendir");
+        exit(1); 
+    }
 
-	while((dir = readdir(d))){
-		if(strcmp( dir->d_name, "." ) == 0){
+	int x = 2, y = 3;
+	box(window, 0, 0);
+
+	while((dir_struct_t = readdir(dir))) {
+		if(strcmp(dir_struct_t->d_name, ".") == 0) {
 			continue;
 	    }
-        choices[i] = dir->d_name;
 
-		if(dir->d_type == DT_DIR){
-			dir_arr[f] = dir->d_name;
-			f++;
+        strcpy(&params->choices[counter], dir_struct_t->d_name);
+
+		if(dir_struct_t->d_type == DT_DIR) {
+			strcpy(&params->dir_arr[dir_counter], dir_struct_t->d_name);
+			dir_counter++;
 		} 
-        i++;
+
+		// High light the present choice 
+		if(params->highlight == counter + 1) { 
+            wattron(window, A_REVERSE); 
+			mvwprintw(window, y, x, "%s", &params->choices[counter]);
+            wattroff(window, A_REVERSE);
+		}
+		else
+			mvwprintw(window, y, x, "%s", &params->choices[counter]);
+        
+		y++;
+        counter++;
 	}
-    *size = i;
-    *dir_size = f;
-	closedir(d);
+    
+    params->size = counter;
+    params->dir_size = dir_counter;
+	closedir(dir);
+	wrefresh(window);
 }
 
-void box_title(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w, int lt_x, int rt_x){
+void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w, int lt_x, int rt_x) {
     box(wnd, box_y, box_x);
 	mvwhline(wnd, line_y, line_x, ACS_HLINE, line_w);
 }
 
-void print_title(WINDOW *win, int starty, int startx, int width, char string[], chtype color){	
+void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color) {	
     int length, x, y;
 	float temp;
 
@@ -136,24 +146,25 @@ void print_title(WINDOW *win, int starty, int startx, int width, char string[], 
 	temp = (width - length)/ 2;
 	x = startx + (int)temp;
 	wattron(win, color);
+    printf("\n");
 	mvwprintw(win, y, x, "%s", string);
 	wattroff(win, color);
 	refresh();
 }
 
-void interfaceFunc(WINDOW **win, char *path, int *size, int x){
+void interfaceFunc(WINDOW **win, struct Arg_struct *params, int x) {
     /* Создаем окно */
     *win = newwin(LINES-4, COLS/2, 3, x);
     keypad(*win, TRUE);
 
     /* Рисуем границы */
-    print_title(*win, 1, 0, COLS/2, path, COLOR_PAIR(1));
-    box_title(*win, 0, 0, 2, 1, COLS/2-2, 0, COLS/2-1);
+    printTitle(*win, 1, 0, COLS/2, params->path, COLOR_PAIR(1));
+    boxTitle(*win, 0, 0, 2, 1, COLS/2-2, 0, COLS/2-1);
 
 	wrefresh(*win);
 }
 
-void displayFunc(){
+void displayFunc(struct Arg_struct *params) {
     initscr();
     curs_set(0);
     start_color();
@@ -161,34 +172,21 @@ void displayFunc(){
 	cbreak();
     init_color(COLOR_BLACK, 140, 140, 140);
     init_pair(1, COLOR_RED, COLOR_BLACK);
-
-    chdir(".");
-    getcwd(path[0], ARR_SIZE);
-    getcwd(path[1], ARR_SIZE);
-
-    scaner(path[0], choices[1], dir_arr[0], 
-            &size[0], &dir_size[0]);
-    scaner(path[1], choices[0], dir_arr[1], 
-            &size[1], &dir_size[1]);
-    printf("\n");
-
+    
     char *title="---------- File Manager ----------";
-    print_title(stdscr, 1, 0, COLS, title, COLOR_PAIR(1));
+    printTitle(stdscr, 1, 0, COLS, title, COLOR_PAIR(1));
 	mvprintw(LINES - 1, 1, "Tab - Switch panel  F1 - Quit  F5 - Copy");
 
-    interfaceFunc(&windows[0], path[0], &size[0], 0);
-    interfaceFunc(&windows[1], path[1], &size[1], COLS/2);
+    interfaceFunc(&windows[0], &params[0], 0);
+    interfaceFunc(&windows[1], &params[1], COLS/2);
     refresh();
-
-	print_menu(windows[0], highlight[0], choices[1], &size[0]);
-    print_menu(windows[1], highlight[1], choices[0], &size[1]);
 }
 
-void reloadWinFunc(WINDOW *win, char *choices[], char *path, char *dir_arr[], int *highlight, int *size, int *dir_size){
+void reloadWinFunc(WINDOW *win, char *choices[], char *path, char *dir_arr[], int *highlight, int *size, int *dir_size) {
     getcwd(path, ARR_SIZE);
     wclear(win);
-    scaner(path, choices, dir_arr, size, dir_size);
+    // scaner(&params);
     
-    print_title(win, 1, 0, COLS/2, path, COLOR_PAIR(1));
-    box_title(win, 0, 0, 2, 1, COLS/2-2, 0, COLS/2-1);
+    printTitle(win, 1, 0, COLS/2, path, COLOR_PAIR(1));
+    boxTitle(win, 0, 0, 2, 1, COLS/2-2, 0, COLS/2-1);
 }
