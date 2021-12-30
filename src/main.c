@@ -6,28 +6,23 @@ int main() {
 	#endif
 
 	int cycle = 1, win_tab = 0;
-	struct Arg_struct params[2];
+	struct Arg_struct params[2];				// 0 - Левое; 1 - правое окно
 
 	pthread_mutex_init(&mutex, NULL);
 	chdir(".");									// Устан. путь
 	displayFunc(params);						// Инициализируем интерфейс приложения
 	
-	LOG_CHAR(params[0].path, 0);
-	
 	while(cycle) {
 		/* переключение между окнами */
-		if(!win_tab) {
+		if(!win_tab) {		// Левое окно
 			switchFunc(&params[0], &cycle, &win_tab);
 			printList(&params[0]);
 		}
 
-		if(win_tab) {
+		if(win_tab) {		// Правое окно
 			switchFunc(&params[1], &cycle, &win_tab);
 			printList(&params[1]);
 		}
-
-		// switchFunc(&params[win_tab], &cycle, &win_tab);
-		// printMenu(windows[win_tab], &params[win_tab]);
 	}
 
 	pthread_mutex_destroy(&mutex);

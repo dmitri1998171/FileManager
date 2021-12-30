@@ -52,8 +52,6 @@ void createSubwindow(struct Arg_struct *params, int x) {
     params->window = newwin(LINES-4, COLS/2, 3, x);
     keypad(params->window, TRUE);
 
-    LOG_CHAR(params->path, 0);
-    
     /* Рисуем границы */
     printTitle(params->window, 1, 0, COLS/2, params->path, COLOR_PAIR(1));
     boxTitle(params->window, 0, 0, 2, 1, COLS/2-2, 0, COLS/2-1);
@@ -74,28 +72,31 @@ void displayFunc(struct Arg_struct *params) {
     printTitle(stdscr, 1, 0, COLS, title, COLOR_PAIR(1));
 	mvprintw(LINES - 1, 1, "Tab - Switch panel  F1 - Quit  F5 - Copy");
 
-	createSubwindow(&params[0], 0);
-    createSubwindow(&params[1], COLS/2);
-
     for (int i = 0; i < 2; i++) {
-		params[i].highlight = 1;
 		getcwd(params[i].path, ARR_SIZE);		// Получ. путь
+    	
+        if(!i)
+            createSubwindow(&params[0], 0);
+        else
+            createSubwindow(&params[1], COLS/2);
+
+		params[i].highlight = 1;
 		scaner(&params[i]);						// Сканируем директорию
 		printList(&params[i]);					// Выводим на экран
 	}
 }
 
-void reloadWinFunc(WINDOW *win, char *choices[], char *path, char *dir_arr[], int *highlight, int *size, int *dir_size) {
-    getcwd(path, ARR_SIZE);
-    wclear(win);
-    // scaner(&params);
+inline void reloadWinFunc(struct Arg_struct *params) {
+    getcwd(params->path, ARR_SIZE);
+    wclear(params->window);
+    scaner(params);
     
-    printTitle(win, 1, 0, COLS/2, path, COLOR_PAIR(1));
-    boxTitle(win, 0, 0, 2, 1, COLS/2-2, 0, COLS/2-1);
+    printTitle(params->window, 1, 0, COLS/2, params->path, COLOR_PAIR(1));
+    boxTitle(params->window, 0, 0, 2, 1, COLS/2-2, 0, COLS/2-1);
 }
 
 void *progressBar(void *param) {
-    int h=6, w=50;
+    int h = 6, w = 50;
     WINDOW *mycopywin;
     WINDOW *mysubwin;
 
@@ -105,7 +106,7 @@ void *progressBar(void *param) {
     start_color();
     init_pair(1, COLOR_RED, COLOR_BLACK);
     
-    mycopywin = newwin(h, w, (LINES/2)-(h/2), (COLS/2)-(w/2));
+    mycopywin = newwin(h, w, (LINES/2) - (h / 2), (COLS/2) - (w / 2));
     box(mycopywin, 0, 0);
 
     wattron(mycopywin, COLOR_PAIR(1));
@@ -113,13 +114,13 @@ void *progressBar(void *param) {
     wattroff(mycopywin, COLOR_PAIR(1));
     mvwprintw(mycopywin, h-5, 8, threadStruct->filename);
 
-    mysubwin = derwin(mycopywin, 3, w-2, 2, 1);
+    mysubwin = derwin(mycopywin, 3, w - 2, 2, 1);
     box(mysubwin, 0,0);
 
     wattroff(mycopywin, COLOR_PAIR(1));
     for(int n = 0; n < w; n++) {
-        mvwaddch(mycopywin, h-3, n+2, '#');
-        mvwprintw(mycopywin, h-5, strlen(threadStruct->filename)+10, "%d%%", (n*2)+6);
+        mvwaddch(mycopywin, h - 3, n + 2, '#');
+        mvwprintw(mycopywin, h - 5, strlen(threadStruct->filename) + 10, "%d%%", (n * 2) + 6);
         wrefresh(mycopywin);
         usleep(100000);
     }
