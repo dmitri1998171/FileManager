@@ -21,11 +21,17 @@
 #if DEBUG
     FILE* fdw;
 
-	#define LOG_NUM(x) fprintf(fdw, "%s: %d\n", #x, x);
-	#define LOG_CHAR(x, switcher)   	    \
-		( (switcher) == 0 ? 				\
-		(fprintf(fdw, "%s\n", x)) :    		\
-		(fprintf(fdw, "%s: %s\n", #x, x)) ); 
+    enum log_level_t {LOG_ERROR, LOG_WARNING, LOG_INFO, LOG_DEBAG};
+
+	#define LOG_NUM(log_level, x)           \
+        ( (log_level == LOG_DEBAG) ?        \
+            (fprintf(fdw, "%s, %s: %d\n", #log_level, #x, x)) :\
+            (fprintf(fdw, "%s, %d\n", #log_level, x)) ); 
+
+	#define LOG_CHAR(log_level, x)   	    \
+        ( (log_level == LOG_DEBAG) ? 		\
+            (fprintf(fdw, "%s, %s: %s\n", #log_level, #x, x)) :\
+            (fprintf(fdw, "%s\n", x)) );		
 #else
 	#define LOG(x) 
 #endif

@@ -8,6 +8,8 @@ int main() {
 	int cycle = 1, win_tab = 0;
 	struct Arg_struct params[2];				// 0 - Левое; 1 - правое окно
 
+	LOG_NUM(LOG_ERROR, win_tab)
+
 	pthread_mutex_init(&mutex, NULL);
 	chdir(".");									// Устан. путь
 	displayFunc(params);						// Инициализируем интерфейс приложения

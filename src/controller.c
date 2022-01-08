@@ -33,6 +33,7 @@ void enterFunc(struct Arg_struct *params) {
 
 void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab) {
     int input = wgetch(params->window);
+    char *tmp;
 
     switch(input) {
         case KEY_DOWN:
@@ -66,9 +67,19 @@ void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab) {
             pthread_join(tid1, NULL);
             pthread_join(tid2, NULL);
 
+        	LOG_NUM(LOG_WARNING, *win_tab)
+
             updateSubwindow(&params[0]);
             updateSubwindow(&params[1]);
+            break;
 
+        case KEY_F(8):
+            snprintf(tmp, ARR_SIZE + 7, "rm -rf %s", params->choices[params->highlight - 1]);
+            
+            // system(tmp);
+            execl("/bin/rm", "/bin/rm", "-rf", params->choices[params->highlight - 1]);
+
+            updateSubwindow(&params[*win_tab]);
             break;
 
         case '\t':

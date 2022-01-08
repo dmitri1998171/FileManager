@@ -72,7 +72,7 @@ void displayFunc(struct Arg_struct *params) {
     
     char *title = "---------- File Manager ----------";
     printTitle(stdscr, 1, 0, COLS, title, COLOR_PAIR(1));
-	mvprintw(LINES - 1, 1, "Tab - Switch panel  F1 - Quit  F5 - Copy");
+	mvprintw(LINES - 1, 1, "Tab - Switch panel  F1 - Quit  F5 - Copy  F8 - Delete");
 
     params[0].window = newwin(LINES-4, COLS/2, 3, 0);         // Левое окно
     params[1].window = newwin(LINES-4, COLS/2, 3, COLS/2);    // Правое окно
