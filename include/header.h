@@ -25,8 +25,8 @@
 
 	#define LOG_NUM(log_level, x)           \
         ( (log_level == LOG_DEBAG) ?        \
-            (fprintf(fdw, "%s, %s: %d\n", #log_level, #x, x)) :\
-            (fprintf(fdw, "%s, %d\n", #log_level, x)) ); 
+            (fprintf(fdw, "%s, %s: %lu\n", #log_level, #x, x)) :\
+            (fprintf(fdw, "%s, %lu\n", #log_level, x)) ); 
 
 	#define LOG_CHAR(log_level, x)   	    \
         ( (log_level == LOG_DEBAG) ? 		\
@@ -62,17 +62,17 @@ struct pthread_struct {
 void scaner(struct Arg_struct *params);
 
 // view.c
-void printList(struct Arg_struct *params);
+void printList(struct Arg_struct params[2], int win_tab);
 void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w, int lt_x, int rt_x);
 void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color);
 void createSubwindow(struct Arg_struct *params, int x);
-void displayFunc(struct Arg_struct *params);
-void updateSubwindow(struct Arg_struct *params);
+void displayFunc(struct Arg_struct params[2], int win_tab);
+void updateSubwindow(struct Arg_struct params[2], int win_tab);
 void *progressBar(void *param);
 
 // controller.c
-void enterFunc(struct Arg_struct *params);
-void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab);
+void enterFunc(struct Arg_struct *params, int win_tab);
+void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab);
 
 // copy.c
 void renameFunc(char path_r[], char path_w[]);

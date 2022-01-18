@@ -1,16 +1,16 @@
 #include "../include/header.h"
 
-void enterFunc(struct Arg_struct *params) {   
+void enterFunc(struct Arg_struct *params, int win_tab) {   
     int check = 0;
     
     for(int i = 0; i < params->dir_size; i++) {
         // Переходим в директорию
-        if(!strcmp(params->choices[params->highlight-1], params->dir_arr[i])) {
-            chdir(params->choices[params->highlight-1]);
-            updateSubwindow(params);
+        if(!strcmp(params->choices[params->highlight - 1], params->dir_arr[i])) {
+            chdir(params->choices[params->highlight - 1]);
+            updateSubwindow(params, win_tab);
 
             params->highlight = 1;
-            check += 1;   
+            check += 1;
         }
     }
 
@@ -25,31 +25,33 @@ void enterFunc(struct Arg_struct *params) {
         }
 
         wait(&pid);
-        displayFunc(params);
+        displayFunc(params, win_tab);
     }
     
     refresh();
 }
 
-void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab) {
-    int input = wgetch(params->window);
-    char *tmp;
+void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
+    char tmp[ARR_SIZE * 2];
+    char path_r[ARR_SIZE];
+    char path_w[ARR_SIZE];
+    int input = wgetch(params[*win_tab].window);
 
     switch(input) {
         case KEY_DOWN:
-            if(params->highlight == params->size)
-                params->highlight = 1;
+            if(params[*win_tab].highlight == params[*win_tab].size)
+                params[*win_tab].highlight = 1;
             else 
-                ++params->highlight;  
+                ++params[*win_tab].highlight;  
             
             break;
 
         case KEY_UP:
-            if(params->highlight == 1) {
-                params->highlight = params->size;
+            if(params[*win_tab].highlight == 1) {
+                params[*win_tab].highlight = params[*win_tab].size;
             }
             else
-                --params->highlight;
+                --params[*win_tab].highlight;
 
             break;
 
@@ -58,28 +60,35 @@ void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab) {
             break;
 
         case KEY_F(5):
-            pthreadStruct.filename = params->choices[params->highlight - 1];
+            pthreadStruct.filename = params[*win_tab].choices[params[*win_tab].highlight - 1];
             pthreadStruct.pBarName = "Copy: "; 
 
-            pthread_create(&tid1, NULL, copyFunc, params->choices[params->highlight - 1]);
             pthread_create(&tid2, NULL, progressBar, &pthreadStruct);
 
-            pthread_join(tid1, NULL);
+            snprintf(path_r, sizeof(path_r), "%s/%s", params[*win_tab].path, params[*win_tab].choices[params[*win_tab].highlight - 1]);
+            renameFunc(params[*win_tab].choices[params[*win_tab].highlight - 1], path_w);
+            snprintf(tmp, sizeof(path_r) + sizeof(params[*win_tab].path), "cp %s %s/%s", path_r, params[*win_tab].path, path_w);
+            
+            system(tmp);
+
             pthread_join(tid2, NULL);
 
-        	LOG_NUM(LOG_WARNING, *win_tab)
+            /*
+                Передается только один элемент массива структур.
+                Чтобы обновить второй нужно его достать - где ???
+            */ 
 
-            updateSubwindow(&params[0]);
-            updateSubwindow(&params[1]);
+            LOG_NUM(LOG_DEBAG, *win_tab)
+            updateSubwindow(params, *win_tab);
+            updateSubwindow(params, *win_tab);
             break;
 
         case KEY_F(8):
-            snprintf(tmp, ARR_SIZE + 7, "rm -rf %s", params->choices[params->highlight - 1]);
-            
-            // system(tmp);
-            execl("/bin/rm", "/bin/rm", "-rf", params->choices[params->highlight - 1]);
+            snprintf(tmp, ARR_SIZE + 7, "rm -rf %s", params[*win_tab].choices[params->highlight - 1]);
 
-            updateSubwindow(&params[*win_tab]);
+            system(tmp);
+
+            updateSubwindow(params, *win_tab);
             break;
 
         case '\t':
@@ -91,7 +100,7 @@ void switchFunc(struct Arg_struct *params, int *cycle, int *win_tab) {
             break;
 
         case 10:
-            enterFunc(params);
+            enterFunc(params, *win_tab);
             break;
     }
 }

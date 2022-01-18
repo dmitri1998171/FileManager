@@ -7,7 +7,7 @@ void renameFunc(char path_r[], char path_w[]) {
     strcpy(path_w, path_r);
     strcpy(name, strtok(path_w, "."));
     strcpy(ext, strtok(NULL, "."));
-    strcat(name, "(1).");
+    strcat(name, "-copy.");
     strcat(name, ext);
     strcpy(path_w, name);
 }
