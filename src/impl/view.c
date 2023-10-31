@@ -93,7 +93,7 @@ inline void updateSubwindow(struct Arg_struct params[2], int win_tab) {
     printList(params, win_tab);	                    // Выводим на экран
 
     printTitle(params[win_tab].window, 1, 0, COLS/2, params[win_tab].path, COLOR_PAIR(1));
-    boxTitle(params[win_tab].window, 0, 0, 2, 1, COLS/2-2, 0, COLS/2-1);
+    boxTitle(params[win_tab].window, 0, 0, 2, 1, (COLS/2) - 2, 0, (COLS/2) - 1);
 
     wrefresh(params[win_tab].window);
 }

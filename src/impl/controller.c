@@ -47,9 +47,8 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
             break;
 
         case KEY_UP:
-            if(params[*win_tab].highlight == 1) {
+            if(params[*win_tab].highlight == 1)
                 params[*win_tab].highlight = params[*win_tab].size;
-            }
             else
                 --params[*win_tab].highlight;
 
@@ -91,7 +90,7 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
             updateSubwindow(params, *win_tab);
             break;
 
-        case '\t':
+        case 9:                                     // Tab button
             *win_tab += 1;
 
             if(*win_tab > 1) 
@@ -99,7 +98,12 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
 
             break;
 
-        case 10:
+        case 10:                                    // Enter button
+            enterFunc(params, *win_tab);
+            break;
+
+        case 27:                                    // Escape button
+            params[*win_tab].highlight = 1;
             enterFunc(params, *win_tab);
             break;
     }
