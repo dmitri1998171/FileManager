@@ -10,7 +10,7 @@ int main() {
 
 	pthread_mutex_init(&mutex, NULL);
 	chdir(".");									// Устан. путь
-	displayFunc(params, win_tab);						// Инициализируем интерфейс приложения
+	displayFunc(params, win_tab);				// Инициализируем интерфейс приложения
 	
 	while(cycle) {
 		/* переключение между окнами */

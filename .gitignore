@@ -1,7 +1,5 @@
-main
+bin/*
 *.o
-TODO.md
+*.log
 .DS_Store
-log.log
-error.log
-text(1).txt
+.vscode

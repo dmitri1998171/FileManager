@@ -1,4 +1,4 @@
-#include "../include/header.h"
+#include "../../include/header.h"
 
 void renameFunc(char path_r[], char path_w[]) {
     char name[255];

@@ -25,8 +25,8 @@
 
 	#define LOG_NUM(log_level, x)           \
         ( (log_level == LOG_DEBAG) ?        \
-            (fprintf(fdw, "%s, %s: %lu\n", #log_level, #x, x)) :\
-            (fprintf(fdw, "%s, %lu\n", #log_level, x)) ); 
+            (fprintf(fdw, "%s, %s: %d\n", #log_level, #x, x)) :\
+            (fprintf(fdw, "%s, %d\n", #log_level, x)) ); 
 
 	#define LOG_CHAR(log_level, x)   	    \
         ( (log_level == LOG_DEBAG) ? 		\
@@ -44,11 +44,11 @@ pthread_t tid1, tid2;
 pthread_mutex_t mutex;
 
 struct Arg_struct {
-        char *dir_arr[ARR_SIZE];
+        char *dir_arr[ARR_SIZE];        // Список папок в текущ. директории
         char *choices[ARR_SIZE];
-        char path[ARR_SIZE];
-        int size;
-        int dir_size;
+        char path[ARR_SIZE];            // Путь к текущ. директории
+        int size;                       // Обшее кол-во файлов в текущ. директории
+        int dir_size;                   // Кол-во папок в текущ. директории
         int highlight;
         WINDOW *window;
 };
@@ -59,7 +59,7 @@ struct pthread_struct {
 }pthreadStruct;
 
 // model.c
-void scaner(struct Arg_struct *params);
+void scaner(struct Arg_struct params[2], int win_tab);
 
 // view.c
 void printList(struct Arg_struct params[2], int win_tab);

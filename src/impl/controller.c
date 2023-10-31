@@ -1,4 +1,4 @@
-#include "../include/header.h"
+#include "../../include/header.h"
 
 void enterFunc(struct Arg_struct *params, int win_tab) {   
     int check = 0;

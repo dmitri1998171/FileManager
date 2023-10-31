@@ -1,4 +1,4 @@
-#include "../include/header.h"
+#include "../../include/header.h"
 
 #define BORDER 2
 
@@ -7,7 +7,7 @@ void printList(struct Arg_struct params[2], int win_tab) {
 	box(params[win_tab].window, 0, 0);
 
     for (int i = 0; i < params[win_tab].size; i++) {
-		// High light the present choice 
+		// Highlight the present choice 
 		if(params[win_tab].highlight == i + 1) { 
             wattron(params[win_tab].window, A_REVERSE); 
 			mvwprintw(params[win_tab].window, y, x, "%s", params[win_tab].choices[i]);
@@ -74,6 +74,7 @@ void displayFunc(struct Arg_struct params[2], int win_tab) {
     printTitle(stdscr, 1, 0, COLS, title, COLOR_PAIR(1));
 	mvprintw(LINES - 1, 1, "Tab - Switch panel  F1 - Quit  F5 - Copy  F8 - Delete");
 
+    // Создание подокон 
     params[0].window = newwin(LINES-4, COLS/2, 3, 0);         // Левое окно
     params[1].window = newwin(LINES-4, COLS/2, 3, COLS/2);    // Правое окно
 
@@ -88,9 +89,9 @@ inline void updateSubwindow(struct Arg_struct params[2], int win_tab) {
     getcwd(params[win_tab].path, ARR_SIZE);         // Получ. путь
     LOG_CHAR(LOG_DEBAG, params[win_tab].path)
     wclear(params[win_tab].window);                 // Очищ. окно
-    scaner(params);                                 // Сканируем директорию
+    scaner(params, win_tab);                        // Сканируем директорию
     printList(params, win_tab);	                    // Выводим на экран
-     
+
     printTitle(params[win_tab].window, 1, 0, COLS/2, params[win_tab].path, COLOR_PAIR(1));
     boxTitle(params[win_tab].window, 0, 0, 2, 1, COLS/2-2, 0, COLS/2-1);
 
