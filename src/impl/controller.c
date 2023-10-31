@@ -1,5 +1,7 @@
 #include "../../include/header.h"
 
+#define CTRL(x) (x & 0x1F)
+
 void enterFunc(struct Arg_struct *params, int win_tab) {   
     int check = 0;
     
@@ -107,5 +109,12 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
             enterFunc(params, *win_tab);
             break;
     }
+
+    // Shortcuts
+    if(input == CTRL('u')) 
+        params[*win_tab].highlight = 1;
+    
+    if(input == CTRL('d')) 
+        params[*win_tab].highlight = params[*win_tab].size;
 }
 
