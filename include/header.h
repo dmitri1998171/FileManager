@@ -63,7 +63,7 @@ void scaner(struct Arg_struct params[2], int win_tab);
 
 // view.c
 void printList(struct Arg_struct params[2], int win_tab);
-void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w, int lt_x, int rt_x);
+void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w);
 void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color);
 void createSubwindow(struct Arg_struct *params, int x);
 void displayFunc(struct Arg_struct params[2], int win_tab);
