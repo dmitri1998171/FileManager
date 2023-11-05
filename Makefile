@@ -8,7 +8,7 @@ OBJECTS := $(addprefix obj/, $(OBJECTS))
 
 CC := gcc
 CFLAGS := -Wall -g # -lpthread
-LDFLAGS := -lncurses
+LDFLAGS := -lpanel -lncurses
 
 .PHONY: all clean
 

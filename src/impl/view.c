@@ -2,17 +2,25 @@
 
 #define BORDER 2
 
+void init() {
+    initscr();
+    curs_set(0);
+    start_color();
+	noecho();
+	cbreak();
+    init_color(COLOR_BLACK, 140, 140, 140); 
+    init_pair(1, COLOR_RED, COLOR_BLACK);
+    init_pair(2, COLOR_WHITE, COLOR_RED);
+}
+
 void printList(struct Arg_struct params[2], int win_tab) {
 	int x = 2, y = 3;
-	box(params[win_tab].window, 0, 0);
 
     for (int i = 0; i < params[win_tab].size; i++) {
 		// Highlight the present choice 
 		if(params[win_tab].highlight == i + 1) { 
-            // wattron(params[win_tab].window, A_REVERSE); 
             wattron(params[win_tab].window, COLOR_PAIR(2)); 
 			mvwprintw(params[win_tab].window, y, x, "%s", params[win_tab].choices[i]);
-            // wattroff(params[win_tab].window, A_REVERSE);
             wattroff(params[win_tab].window, COLOR_PAIR(2));
 		}
 		else
@@ -64,14 +72,7 @@ void createSubwindow(struct Arg_struct *params, int x) {
 }
 
 void displayFunc(struct Arg_struct params[2], int win_tab) {
-    initscr();
-    curs_set(0);
-    start_color();
-	noecho();
-	cbreak();
-    init_color(COLOR_BLACK, 140, 140, 140); 
-    init_pair(1, COLOR_RED, COLOR_BLACK);
-    init_pair(2, COLOR_WHITE, COLOR_RED);
+    init();
 
     // Создание кнопок и hotkeys
 	mvprintw(0, 1, "Left panel    Settings    Right panel");
@@ -99,19 +100,23 @@ void displayFunc(struct Arg_struct params[2], int win_tab) {
 	}
 }
 
-inline void updateSubwindow(struct Arg_struct params[2], int win_tab) {
-    getcwd(params[win_tab].path, ARR_SIZE);         // Получ. путь
-    LOG_CHAR(LOG_DEBAG, params[win_tab].path)
+void redrawSubwindow(struct Arg_struct params[2], int win_tab) {
     wclear(params[win_tab].window);                 // Очищ. окно
-    scaner(params, win_tab);                        // Сканируем директорию
-    printList(params, win_tab);	                    // Выводим на экран
-
+    
     wattron(params[win_tab].window,  A_BOLD); 
     printTitle(params[win_tab].window, 1, 0, COLS/2, params[win_tab].path, COLOR_PAIR(2));
     wattroff(params[win_tab].window,  A_BOLD); 
 
     boxTitle(params[win_tab].window, 0, 0, 2, 1, (COLS/2) - 2);
     wrefresh(params[win_tab].window);
+}
+
+inline void updateSubwindow(struct Arg_struct params[2], int win_tab) {
+    getcwd(params[win_tab].path, ARR_SIZE);         // Получ. путь
+    LOG_CHAR(LOG_DEBAG, params[win_tab].path)
+    scaner(params, win_tab);                        // Сканируем директорию
+    redrawSubwindow(params, win_tab);               // Отрисовываем подокно
+    printList(params, win_tab);	                    // Выводим на экран список файлов
 }
 
 void *progressBar(void *param) {

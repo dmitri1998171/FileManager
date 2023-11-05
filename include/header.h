@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <ncurses.h>
+#include <panel.h>
 
 // ##############################
 #define DEBUG 1
@@ -53,6 +54,17 @@ struct Arg_struct {
         WINDOW *window;
 };
 
+PANEL  *tabs[3];
+
+enum panel_states {
+    HIDE = 0,
+    LEFT_PANEL,
+    SETTINGS,
+    RIGHT_PANEL
+};
+
+int panel_state;
+
 struct pthread_struct {
     char *filename;
     char *pBarName;
@@ -67,6 +79,7 @@ void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int lin
 void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color);
 void createSubwindow(struct Arg_struct *params, int x);
 void displayFunc(struct Arg_struct params[2], int win_tab);
+void redrawSubwindow(struct Arg_struct params[2], int win_tab);
 void updateSubwindow(struct Arg_struct params[2], int win_tab);
 void *progressBar(void *param);
 

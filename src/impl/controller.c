@@ -105,8 +105,48 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
             break;
 
         case 27:                                    // Escape button
-            params[*win_tab].highlight = 1;
-            enterFunc(params, *win_tab);
+            if(panel_state == HIDE) {
+                params[*win_tab].highlight = 1;
+                enterFunc(params, *win_tab);
+            } else {
+                panel_state = HIDE;
+                
+                for(int i = 0; i < 3; i++)
+                hide_panel(tabs[i]);
+
+                redrawSubwindow(params, *win_tab);
+            }
+
+            break;
+
+        case '1':
+            panel_state = LEFT_PANEL;
+
+            for(int i = 0; i < 3; i++)
+                hide_panel(tabs[i]);
+
+            redrawSubwindow(params, *win_tab);
+            show_panel(tabs[0]);
+            break;
+
+        case '2':
+            panel_state = SETTINGS;
+
+            for(int i = 0; i < 3; i++)
+                hide_panel(tabs[i]);
+
+            redrawSubwindow(params, *win_tab);
+            show_panel(tabs[1]);
+            break;
+
+        case '3':
+            panel_state = RIGHT_PANEL;
+
+            for(int i = 0; i < 3; i++)
+                hide_panel(tabs[i]);
+
+            redrawSubwindow(params, *win_tab);
+            show_panel(tabs[2]);
             break;
     }
 
@@ -116,5 +156,8 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
     
     if(input == CTRL('d')) 
         params[*win_tab].highlight = params[*win_tab].size;
+
+    update_panels();
+	doupdate();
 }
 
