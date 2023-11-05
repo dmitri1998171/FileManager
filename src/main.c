@@ -20,6 +20,7 @@ int main() {
 	ESCDELAY = 0;								// Убирает задержку при нажатии Escape
 	panel_state = HIDE;
 	int cycle = 1, win_tab = 0;
+	tab_btn_highlight = 0;
 	struct Arg_struct params[2];				// 0 - Левое окно; 1 - правое окно
 
 	pthread_mutex_init(&mutex, NULL);

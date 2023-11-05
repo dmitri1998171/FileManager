@@ -50,16 +50,32 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
         "option_3"
 	};
 
+	int settingsTabBtnCount = countLines(settings_btns, NLINES);
+	int panelTabBtnCount = countLines(panel_btns, NLINES);
+
     int input = wgetch(params[*win_tab].window);
 
     switch(input) {
         case KEY_DOWN:
-            if(params[*win_tab].highlight == params[*win_tab].size)
-                params[*win_tab].highlight = 1;
-            else 
-                ++params[*win_tab].highlight;  
-            
-			printList(params, *win_tab);
+            if(panel_state == HIDE) {
+                if(params[*win_tab].highlight == params[*win_tab].size)
+                    params[*win_tab].highlight = 1;
+                else 
+                    ++params[*win_tab].highlight;  
+                
+                printList(params, *win_tab);
+            } else {
+                if(tab_btn_highlight == panelTabBtnCount - 1)
+                    tab_btn_highlight = 0;
+                else 
+                    ++tab_btn_highlight;
+
+                if(panel_state == SETTINGS)
+                    showTabButtons(settings_btns, wins[panel_state], settingsTabBtnCount);
+                else 
+                    showTabButtons(panel_btns, wins[panel_state], panelTabBtnCount);
+            }
+
             break;
 
         case KEY_UP:
@@ -146,7 +162,7 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
 
             redrawSubwindow(params, *win_tab);
             show_panel(tabs[0]);
-            showTabButtons(panel_btns, wins[0]);
+            showTabButtons(panel_btns, wins[0], panelTabBtnCount);
             update_panels();
             doupdate();
             break;
@@ -159,7 +175,7 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
 
             redrawSubwindow(params, *win_tab);
             show_panel(tabs[1]);
-            showTabButtons(settings_btns, wins[1]);
+            showTabButtons(settings_btns, wins[1], settingsTabBtnCount);
             update_panels();
             doupdate();
             break;
@@ -172,7 +188,7 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
 
             redrawSubwindow(params, *win_tab);
             show_panel(tabs[2]);
-            showTabButtons(panel_btns, wins[2]);
+            showTabButtons(panel_btns, wins[2], panelTabBtnCount);
             update_panels();
             doupdate();
             break;

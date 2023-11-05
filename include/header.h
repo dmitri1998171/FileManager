@@ -61,13 +61,14 @@ WINDOW *wins[3];
 PANEL  *tabs[5];
 
 enum panel_states {
-    HIDE = 0,
-    LEFT_PANEL,
-    SETTINGS,
-    RIGHT_PANEL
+    LEFT_PANEL = 0,
+    SETTINGS = 1,
+    RIGHT_PANEL = 2,
+    HIDE = 3
 };
 
 int panel_state;
+int tab_btn_highlight;
 
 struct pthread_struct {
     char *filename;
@@ -76,11 +77,12 @@ struct pthread_struct {
 
 // model.c
 void scaner(struct Arg_struct params[2], int win_tab);
+int countLines(char arr[][NCOLS], int totalLines);
 
 // view.c
 void init();
 void printList(struct Arg_struct params[2], int win_tab);
-void showTabButtons(char btns[NLINES][NCOLS], WINDOW* win);
+void showTabButtons(char btns[NLINES][NCOLS], WINDOW* win, int lines);
 void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w);
 void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color);
 void displayFunc(struct Arg_struct params[2], int win_tab);

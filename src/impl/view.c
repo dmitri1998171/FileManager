@@ -35,28 +35,12 @@ void printList(struct Arg_struct params[2], int win_tab) {
 	wrefresh(params[win_tab].window);
 }
 
-int countLines(char arr[][NCOLS], int totalLines) {
-    int i = 0, lines = 0;
-    
-    while(i < totalLines) {
-        if(strlen(arr[i]) > 0)
-            lines++;
-
-        i++;
-    }
-
-    return lines;
-}
-
-void showTabButtons(char btns[NLINES][NCOLS], WINDOW* win) {
+void showTabButtons(char btns[NLINES][NCOLS], WINDOW* win, int lines) {
     int x = 1, y = 1;
-    int highlight = 0;
-
-    int lines = countLines(btns, NLINES);
 
     for (int i = 0; i < lines; i++) {
 		// Highlight the present choice 
-		if(i == highlight) { 
+		if(i == tab_btn_highlight) { 
             wattron(win, COLOR_PAIR(4) | A_BOLD); 
 			mvwprintw(win, y, x, "%s", btns[i]);
             wattroff(win, COLOR_PAIR(4) | A_BOLD);
@@ -126,7 +110,6 @@ void displayFunc(struct Arg_struct params[2], int win_tab) {
 
     tabs[3] = new_panel(params[0].window);
     tabs[4] = new_panel(params[1].window);
-
 
     for (int i = 0; i < 2; i++) {
         keypad(params[i].window, TRUE);

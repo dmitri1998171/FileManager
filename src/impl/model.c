@@ -30,3 +30,16 @@ void scaner(struct Arg_struct params[2], int win_tab) {
     params[win_tab].dir_size = dir_counter;
 	closedir(dir);
 }
+
+int countLines(char arr[][NCOLS], int totalLines) {
+    int i = 0, lines = 0;
+    
+    while(i < totalLines) {
+        if(strlen(arr[i]) > 0)
+            lines++;
+
+        i++;
+    }
+
+    return lines;
+}
