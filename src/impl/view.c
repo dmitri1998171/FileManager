@@ -1,8 +1,9 @@
 #include "../../include/header.h"
 
 #define BORDER 2
+#define COLOR_SUPERYELLOW 20324
 
-void init() {
+inline void init() {
     initscr();
     curs_set(0);
     start_color();
@@ -11,6 +12,8 @@ void init() {
     init_color(COLOR_BLACK, 140, 140, 140); 
     init_pair(1, COLOR_RED, COLOR_BLACK);
     init_pair(2, COLOR_WHITE, COLOR_RED);
+    init_pair(3, COLOR_BLACK, COLOR_WHITE);
+    init_pair(4, COLOR_YELLOW, COLOR_RED);
 }
 
 void printList(struct Arg_struct params[2], int win_tab) {
@@ -32,12 +35,50 @@ void printList(struct Arg_struct params[2], int win_tab) {
 	wrefresh(params[win_tab].window);
 }
 
+int countLines(char arr[][NCOLS], int totalLines) {
+    int i = 0, lines = 0;
+    
+    while(i < totalLines) {
+        if(strlen(arr[i]) > 0)
+            lines++;
+
+        i++;
+    }
+
+    return lines;
+}
+
+void showTabButtons(char btns[NLINES][NCOLS], WINDOW* win) {
+    int x = 1, y = 1;
+    int highlight = 0;
+
+    int lines = countLines(btns, NLINES);
+
+    for (int i = 0; i < lines; i++) {
+		// Highlight the present choice 
+		if(i == highlight) { 
+            wattron(win, COLOR_PAIR(4) | A_BOLD); 
+			mvwprintw(win, y, x, "%s", btns[i]);
+            wattroff(win, COLOR_PAIR(4) | A_BOLD);
+		}
+		else {
+            wattron(win, COLOR_PAIR(3)); 
+			mvwprintw(win, y, x, "%s", btns[i]);
+            wattroff(win, COLOR_PAIR(3));
+        }
+        
+		y++;
+    }
+
+	wrefresh(win);
+}
+
 inline void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w) {
     box(wnd, box_y, box_x);
 	mvwhline(wnd, line_y, line_x, ACS_HLINE, line_w);
 }
 
-void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color) {	
+inline void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color) {	
     int length, x, y;
 	float temp;
 
@@ -59,20 +100,10 @@ void printTitle(WINDOW *win, int starty, int startx, int width, char string[], c
 	refresh();
 }
 
-void createSubwindow(struct Arg_struct *params, int x) {
-    /* Создаем подокно */
-    params->window = newwin(LINES-4, COLS/2, 3, x);
-    keypad(params->window, TRUE);
-
-    /* Рисуем границы */
-    printTitle(params->window, 1, 0, COLS/2, params->path, COLOR_PAIR(1));
-    boxTitle(params->window, 0, 0, 2, 1, COLS/2-2);
-
-	wrefresh(params->window);
-}
-
 void displayFunc(struct Arg_struct params[2], int win_tab) {
     init();
+
+	chdir(".");									// Устан. путь
 
     // Создание кнопок и hotkeys
 	mvprintw(0, 1, "Left panel    Settings    Right panel");
@@ -92,6 +123,10 @@ void displayFunc(struct Arg_struct params[2], int win_tab) {
     // Создание подокон 
     params[0].window = newwin(LINES-4, COLS/2, 1, 0);         // Левое окно
     params[1].window = newwin(LINES-4, COLS/2, 1, COLS/2);    // Правое окно
+
+    tabs[3] = new_panel(params[0].window);
+    tabs[4] = new_panel(params[1].window);
+
 
     for (int i = 0; i < 2; i++) {
         keypad(params[i].window, TRUE);

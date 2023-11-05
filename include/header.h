@@ -38,6 +38,9 @@
 #endif
 // ##############################
 
+#define NLINES 10
+#define NCOLS 20
+#define TAB_OFFSET 13
 #define ARR_SIZE 1024
 #define BUFF_SIZE 5    // кол-во байт, считываемых за раз 
 
@@ -45,16 +48,17 @@ pthread_t tid1, tid2;
 pthread_mutex_t mutex;
 
 struct Arg_struct {
-        char *dir_arr[ARR_SIZE];        // Список папок в текущ. директории
-        char *choices[ARR_SIZE];
-        char path[ARR_SIZE];            // Путь к текущ. директории
-        int size;                       // Обшее кол-во файлов в текущ. директории
-        int dir_size;                   // Кол-во папок в текущ. директории
-        int highlight;
-        WINDOW *window;
+    char *dir_arr[ARR_SIZE];        // Список папок в текущ. директории
+    char *choices[ARR_SIZE];
+    char path[ARR_SIZE];            // Путь к текущ. директории
+    int size;                       // Обшее кол-во файлов в текущ. директории
+    int dir_size;                   // Кол-во папок в текущ. директории
+    int highlight;
+    WINDOW *window;
 };
 
-PANEL  *tabs[3];
+WINDOW *wins[3];
+PANEL  *tabs[5];
 
 enum panel_states {
     HIDE = 0,
@@ -68,16 +72,17 @@ int panel_state;
 struct pthread_struct {
     char *filename;
     char *pBarName;
-}pthreadStruct;
+} pthreadStruct;
 
 // model.c
 void scaner(struct Arg_struct params[2], int win_tab);
 
 // view.c
+void init();
 void printList(struct Arg_struct params[2], int win_tab);
+void showTabButtons(char btns[NLINES][NCOLS], WINDOW* win);
 void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w);
 void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color);
-void createSubwindow(struct Arg_struct *params, int x);
 void displayFunc(struct Arg_struct params[2], int win_tab);
 void redrawSubwindow(struct Arg_struct params[2], int win_tab);
 void updateSubwindow(struct Arg_struct params[2], int win_tab);

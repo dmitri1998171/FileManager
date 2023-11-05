@@ -37,6 +37,19 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
     char tmp[ARR_SIZE * 2];
     char path_r[ARR_SIZE];
     char path_w[ARR_SIZE];
+
+    char panel_btns[NLINES][NCOLS] = {
+        "View mode",
+        "Tree mode",
+        "List mode"
+    };
+
+    char settings_btns[NLINES][NCOLS] = {
+        "option_1",
+        "option_2",
+        "option_3"
+	};
+
     int input = wgetch(params[*win_tab].window);
 
     switch(input) {
@@ -46,6 +59,7 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
             else 
                 ++params[*win_tab].highlight;  
             
+			printList(params, *win_tab);
             break;
 
         case KEY_UP:
@@ -54,6 +68,7 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
             else
                 --params[*win_tab].highlight;
 
+			printList(params, *win_tab);
             break;
 
         case KEY_F(1):
@@ -115,11 +130,15 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
                 hide_panel(tabs[i]);
 
                 redrawSubwindow(params, *win_tab);
+    			printList(params, *win_tab);
+
+                update_panels();
+                doupdate();
             }
 
             break;
 
-        case '1':
+        case '1':                                   // Left panel tab
             panel_state = LEFT_PANEL;
 
             for(int i = 0; i < 3; i++)
@@ -127,9 +146,12 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
 
             redrawSubwindow(params, *win_tab);
             show_panel(tabs[0]);
+            showTabButtons(panel_btns, wins[0]);
+            update_panels();
+            doupdate();
             break;
 
-        case '2':
+        case '2':                                   // Settings tab
             panel_state = SETTINGS;
 
             for(int i = 0; i < 3; i++)
@@ -137,9 +159,12 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
 
             redrawSubwindow(params, *win_tab);
             show_panel(tabs[1]);
+            showTabButtons(settings_btns, wins[1]);
+            update_panels();
+            doupdate();
             break;
 
-        case '3':
+        case '3':                                   // Right panel tab
             panel_state = RIGHT_PANEL;
 
             for(int i = 0; i < 3; i++)
@@ -147,6 +172,9 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
 
             redrawSubwindow(params, *win_tab);
             show_panel(tabs[2]);
+            showTabButtons(panel_btns, wins[2]);
+            update_panels();
+            doupdate();
             break;
     }
 
@@ -157,7 +185,4 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
     if(input == CTRL('d')) 
         params[*win_tab].highlight = params[*win_tab].size;
 
-    update_panels();
-	doupdate();
 }
-
