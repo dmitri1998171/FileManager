@@ -35,26 +35,26 @@ void printList(struct Arg_struct params[2], int win_tab) {
 	wrefresh(params[win_tab].window);
 }
 
-void showTabButtons(char btns[NLINES][NCOLS], WINDOW* win, int lines) {
+void showTabButtons(struct Tab_struct tabs[3]) {
     int x = 1, y = 1;
 
-    for (int i = 0; i < lines; i++) {
+    for (int i = 0; i < tabs[panel_state].linesCounter; i++) {
 		// Highlight the present choice 
-		if(i == tab_btn_highlight) { 
-            wattron(win, COLOR_PAIR(4) | A_BOLD); 
-			mvwprintw(win, y, x, "%s", btns[i]);
-            wattroff(win, COLOR_PAIR(4) | A_BOLD);
+		if(i == tabs[panel_state].highlight) { 
+            wattron(tabs[panel_state].win, COLOR_PAIR(4) | A_BOLD); 
+			mvwprintw(tabs[panel_state].win, y, x, "%s", tabs[panel_state].panel_btns[i]);
+            wattroff(tabs[panel_state].win, COLOR_PAIR(4) | A_BOLD);
 		}
 		else {
-            wattron(win, COLOR_PAIR(3)); 
-			mvwprintw(win, y, x, "%s", btns[i]);
-            wattroff(win, COLOR_PAIR(3));
+            wattron(tabs[panel_state].win, COLOR_PAIR(3)); 
+			mvwprintw(tabs[panel_state].win, y, x, "%s", tabs[panel_state].panel_btns[i]);
+            wattroff(tabs[panel_state].win, COLOR_PAIR(3));
         }
         
 		y++;
     }
 
-	wrefresh(win);
+	wrefresh(tabs[panel_state].win);
 }
 
 inline void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w) {
@@ -108,8 +108,8 @@ void displayFunc(struct Arg_struct params[2], int win_tab) {
     params[0].window = newwin(LINES-4, COLS/2, 1, 0);         // Левое окно
     params[1].window = newwin(LINES-4, COLS/2, 1, COLS/2);    // Правое окно
 
-    tabs[3] = new_panel(params[0].window);
-    tabs[4] = new_panel(params[1].window);
+    params[0].panel = new_panel(params[0].window);
+    params[1].panel = new_panel(params[1].window);
 
     for (int i = 0; i < 2; i++) {
         keypad(params[i].window, TRUE);
@@ -131,7 +131,6 @@ void redrawSubwindow(struct Arg_struct params[2], int win_tab) {
 
 inline void updateSubwindow(struct Arg_struct params[2], int win_tab) {
     getcwd(params[win_tab].path, ARR_SIZE);         // Получ. путь
-    LOG_CHAR(LOG_DEBAG, params[win_tab].path)
     scaner(params, win_tab);                        // Сканируем директорию
     redrawSubwindow(params, win_tab);               // Отрисовываем подокно
     printList(params, win_tab);	                    // Выводим на экран список файлов

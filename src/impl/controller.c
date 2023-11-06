@@ -33,25 +33,10 @@ void enterFunc(struct Arg_struct *params, int win_tab) {
     refresh();
 }
 
-void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
+void switchFunc(struct Arg_struct params[2], struct Tab_struct tabs[3], int *cycle, int *win_tab) {
     char tmp[ARR_SIZE * 2];
     char path_r[ARR_SIZE];
     char path_w[ARR_SIZE];
-
-    char panel_btns[NLINES][NCOLS] = {
-        "View mode",
-        "Tree mode",
-        "List mode"
-    };
-
-    char settings_btns[NLINES][NCOLS] = {
-        "option_1",
-        "option_2",
-        "option_3"
-	};
-
-	int settingsTabBtnCount = countLines(settings_btns, NLINES);
-	int panelTabBtnCount = countLines(panel_btns, NLINES);
 
     int input = wgetch(params[*win_tab].window);
 
@@ -65,26 +50,33 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
                 
                 printList(params, *win_tab);
             } else {
-                if(tab_btn_highlight == panelTabBtnCount - 1)
-                    tab_btn_highlight = 0;
+                if(tabs[panel_state].highlight == tabs[panel_state].linesCounter - 1)
+                    tabs[panel_state].highlight = 0;
                 else 
-                    ++tab_btn_highlight;
+                    ++tabs[panel_state].highlight;
 
-                if(panel_state == SETTINGS)
-                    showTabButtons(settings_btns, wins[panel_state], settingsTabBtnCount);
-                else 
-                    showTabButtons(panel_btns, wins[panel_state], panelTabBtnCount);
+                showTabButtons(tabs);
             }
 
             break;
 
         case KEY_UP:
-            if(params[*win_tab].highlight == 1)
-                params[*win_tab].highlight = params[*win_tab].size;
-            else
-                --params[*win_tab].highlight;
+            if(panel_state == HIDE) {
+                if(params[*win_tab].highlight == 1)
+                    params[*win_tab].highlight = params[*win_tab].size;
+                else
+                    --params[*win_tab].highlight;
 
-			printList(params, *win_tab);
+                printList(params, *win_tab);
+            } else {
+                if(tabs[panel_state].highlight == 0)
+                    tabs[panel_state].highlight = tabs[panel_state].linesCounter - 1;
+                else 
+                    --tabs[panel_state].highlight;
+
+                showTabButtons(tabs);
+            }
+
             break;
 
         case KEY_F(1):
@@ -143,7 +135,7 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
                 panel_state = HIDE;
                 
                 for(int i = 0; i < 3; i++)
-                hide_panel(tabs[i]);
+                    hide_panel(tabs[i].panel);
 
                 redrawSubwindow(params, *win_tab);
     			printList(params, *win_tab);
@@ -156,41 +148,17 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
 
         case '1':                                   // Left panel tab
             panel_state = LEFT_PANEL;
-
-            for(int i = 0; i < 3; i++)
-                hide_panel(tabs[i]);
-
-            redrawSubwindow(params, *win_tab);
-            show_panel(tabs[0]);
-            showTabButtons(panel_btns, wins[0], panelTabBtnCount);
-            update_panels();
-            doupdate();
+            showTab(params, tabs, win_tab);
             break;
 
         case '2':                                   // Settings tab
             panel_state = SETTINGS;
-
-            for(int i = 0; i < 3; i++)
-                hide_panel(tabs[i]);
-
-            redrawSubwindow(params, *win_tab);
-            show_panel(tabs[1]);
-            showTabButtons(settings_btns, wins[1], settingsTabBtnCount);
-            update_panels();
-            doupdate();
+            showTab(params, tabs, win_tab);
             break;
 
         case '3':                                   // Right panel tab
             panel_state = RIGHT_PANEL;
-
-            for(int i = 0; i < 3; i++)
-                hide_panel(tabs[i]);
-
-            redrawSubwindow(params, *win_tab);
-            show_panel(tabs[2]);
-            showTabButtons(panel_btns, wins[2], panelTabBtnCount);
-            update_panels();
-            doupdate();
+            showTab(params, tabs, win_tab);
             break;
     }
 
@@ -201,4 +169,15 @@ void switchFunc(struct Arg_struct params[2], int *cycle, int *win_tab) {
     if(input == CTRL('d')) 
         params[*win_tab].highlight = params[*win_tab].size;
 
+}
+
+inline void showTab(struct Arg_struct params[2], struct Tab_struct tabs[3], int *win_tab) {
+    for(int i = 0; i < 3; i++)
+        hide_panel(tabs[i].panel);
+
+    redrawSubwindow(params, *win_tab);
+    show_panel(tabs[panel_state].panel);
+    showTabButtons(tabs);
+    update_panels();
+    doupdate();
 }
