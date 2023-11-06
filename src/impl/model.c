@@ -1,33 +1,35 @@
 #include "../../include/header.h"
 
-void scaner(struct Arg_struct params[2], int win_tab) {
+void scaner(struct Directory_struct directory[2], int win_tab) {
 	int counter = 0, dir_counter = 0;
 	struct dirent *dir_struct_t;
     DIR *dir;
 
-	dir = opendir(params[win_tab].path);
+	dir = opendir(directory[win_tab].path);
 	if(dir == NULL) { 
         perror("opendir error!");
         exit(1); 
     }
 
 	while((dir_struct_t = readdir(dir))) {
+		struct stat attrib;
+    	stat(dir_struct_t->d_name, &attrib);
+
 		if(strcmp(dir_struct_t->d_name, ".") == 0) {
 			continue;
 	    }
 
-        params[win_tab].choices[counter] = dir_struct_t->d_name;
-
-		if(dir_struct_t->d_type == DT_DIR) {
-			params[win_tab].dir_arr[dir_counter] = dir_struct_t->d_name;
-			dir_counter++;
-		}
-
-        counter++;
+		if(sizeof(directory[win_tab].entity) > 0)
+			directory[win_tab].entity = realloc(directory[win_tab].entity, sizeof(directory[win_tab].entity) + sizeof(struct Entity_struct));
+		
+		directory[win_tab].entity[ directory[win_tab].size ].type = dir_struct_t->d_type;
+		directory[win_tab].entity[ directory[win_tab].size ].size = dir_struct_t->d_reclen;
+		strftime(directory[win_tab].entity[ directory[win_tab].size ].modify_time, MOD_TIME_SIZE, "%b %d %X", localtime(&(attrib.st_ctime)));
+        strcpy(directory[win_tab].entity[ directory[win_tab].size ].name, dir_struct_t->d_name);
+		
+		directory[win_tab].size++;
 	}
 
-    params[win_tab].size = counter;
-    params[win_tab].dir_size = dir_counter;
 	closedir(dir);
 }
 

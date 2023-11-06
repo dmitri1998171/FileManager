@@ -1,7 +1,6 @@
 #include "../../include/header.h"
 
 #define BORDER 2
-#define COLOR_SUPERYELLOW 20324
 
 inline void init() {
     initscr();
@@ -16,23 +15,23 @@ inline void init() {
     init_pair(4, COLOR_YELLOW, COLOR_RED);
 }
 
-void printList(struct Arg_struct params[2], int win_tab) {
+void printList(struct Directory_struct directory[2], int win_tab) {
 	int x = 2, y = 3;
 
-    for (int i = 0; i < params[win_tab].size; i++) {
+    for (int i = 0; i < directory[win_tab].size; i++) {
 		// Highlight the present choice 
-		if(params[win_tab].highlight == i + 1) { 
-            wattron(params[win_tab].window, COLOR_PAIR(2)); 
-			mvwprintw(params[win_tab].window, y, x, "%s", params[win_tab].choices[i]);
-            wattroff(params[win_tab].window, COLOR_PAIR(2));
+		if(directory[win_tab].highlight == i + 1) { 
+            wattron(directory[win_tab].window, COLOR_PAIR(2) | A_BOLD); 
+			mvwprintw(directory[win_tab].window, y, x, "%s", directory[win_tab].entity[i].name);
+            wattroff(directory[win_tab].window, COLOR_PAIR(2) | A_BOLD);
 		}
 		else
-			mvwprintw(params[win_tab].window, y, x, "%s", params[win_tab].choices[i]);
+			mvwprintw(directory[win_tab].window, y, x, "%s", directory[win_tab].entity[i].name);
         
 		y++;
     }
 
-	wrefresh(params[win_tab].window);
+	wrefresh(directory[win_tab].window);
 }
 
 void showTabButtons(struct Tab_struct tabs[3]) {
@@ -84,7 +83,7 @@ inline void printTitle(WINDOW *win, int starty, int startx, int width, char stri
 	refresh();
 }
 
-void displayFunc(struct Arg_struct params[2], int win_tab) {
+void displayFunc(struct Directory_struct directory[2], int win_tab) {
     init();
 
 	chdir(".");									// Устан. путь
@@ -105,35 +104,39 @@ void displayFunc(struct Arg_struct params[2], int win_tab) {
     mvprintw(LINES - 2, 42, " - Delete");
 
     // Создание подокон 
-    params[0].window = newwin(LINES-4, COLS/2, 1, 0);         // Левое окно
-    params[1].window = newwin(LINES-4, COLS/2, 1, COLS/2);    // Правое окно
+    directory[0].window = newwin(LINES-4, COLS/2, 1, 0);         // Левое окно
+    directory[1].window = newwin(LINES-4, COLS/2, 1, COLS/2);    // Правое окно
 
-    params[0].panel = new_panel(params[0].window);
-    params[1].panel = new_panel(params[1].window);
+    directory[0].panel = new_panel(directory[0].window);
+    directory[1].panel = new_panel(directory[1].window);
 
     for (int i = 0; i < 2; i++) {
-        keypad(params[i].window, TRUE);
-		params[i].highlight = 1;
-        updateSubwindow(params, i);
+        keypad(directory[i].window, TRUE);
+	
+        directory[i].size = 0;
+    	directory[i].entity = (struct Entity_struct*) malloc(sizeof(struct Entity_struct));
+    	directory[i].highlight = 1;
+
+        updateSubwindow(directory, i);
 	}
 }
 
-void redrawSubwindow(struct Arg_struct params[2], int win_tab) {
-    wclear(params[win_tab].window);                 // Очищ. окно
+void redrawSubwindow(struct Directory_struct directory[2], int win_tab) {
+    wclear(directory[win_tab].window);                 // Очищ. окно
     
-    wattron(params[win_tab].window,  A_BOLD); 
-    printTitle(params[win_tab].window, 1, 0, COLS/2, params[win_tab].path, COLOR_PAIR(2));
-    wattroff(params[win_tab].window,  A_BOLD); 
+    wattron(directory[win_tab].window,  A_BOLD); 
+    printTitle(directory[win_tab].window, 1, 0, COLS/2, directory[win_tab].path, COLOR_PAIR(2));
+    wattroff(directory[win_tab].window,  A_BOLD); 
 
-    boxTitle(params[win_tab].window, 0, 0, 2, 1, (COLS/2) - 2);
-    wrefresh(params[win_tab].window);
+    boxTitle(directory[win_tab].window, 0, 0, 2, 1, (COLS/2) - 2);
+    wrefresh(directory[win_tab].window);
 }
 
-inline void updateSubwindow(struct Arg_struct params[2], int win_tab) {
-    getcwd(params[win_tab].path, ARR_SIZE);         // Получ. путь
-    scaner(params, win_tab);                        // Сканируем директорию
-    redrawSubwindow(params, win_tab);               // Отрисовываем подокно
-    printList(params, win_tab);	                    // Выводим на экран список файлов
+inline void updateSubwindow(struct Directory_struct directory[2], int win_tab) {
+    getcwd(directory[win_tab].path, ARR_SIZE);         // Получ. путь
+    scaner(directory, win_tab);                        // Сканируем директорию
+    redrawSubwindow(directory, win_tab);               // Отрисовываем подокно
+    printList(directory, win_tab);	                    // Выводим на экран список файлов
 }
 
 void *progressBar(void *param) {
