@@ -33,7 +33,7 @@ void scaner(struct Directory_struct directory[2], int win_tab) {
 	closedir(dir);
 }
 
-int countLines(char arr[][NCOLS], int totalLines) {
+int countLines(char **arr, int totalLines) {
     int i = 0, lines = 0;
     
     while(i < totalLines) {

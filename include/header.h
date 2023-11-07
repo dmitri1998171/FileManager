@@ -68,7 +68,7 @@ struct Entity_struct {
 struct Tab_struct {
     int highlight;
     int linesCounter;
-    char panel_btns[NLINES][NCOLS];
+    char **panel_btns;
     WINDOW *win;
     PANEL  *panel;
 };
@@ -89,7 +89,7 @@ int panel_state;
 
 // model.c
 void scaner(struct Directory_struct directory[2], int win_tab);
-int countLines(char arr[][NCOLS], int totalLines);
+int countLines(char **arr, int totalLines);
 
 // view.c
 void init();
