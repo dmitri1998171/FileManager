@@ -2,27 +2,22 @@
 
 #define CTRL(x) (x & 0x1F)
 
-void enterFunc(struct Directory_struct *directory, int win_tab) {   
-    int check = 0;
-    
-    // for(int i = 0; i < directory->dir_size; i++) {
-    //     // Переходим в директорию
-    //     if(!strcmp(directory->choices[directory->highlight - 1], directory->dir_arr[i])) {
-    //         chdir(directory->choices[directory->highlight - 1]);
-    //         updateSubwindow(directory, win_tab);
+void enterFunc(struct Directory_struct directory[2], int win_tab) {   
+    // Если директория
+    if(directory[win_tab].entity[directory[win_tab].highlight - 1].type == DT_DIR) {
+        chdir(directory[win_tab].entity[directory[win_tab].highlight - 1].name);
+        updateSubwindow(directory, win_tab);
 
-    //         directory->highlight = 1;
-    //         check += 1;
-    //     }
-    // }
+        directory[win_tab].highlight = 1;
+    }
 
-    // // Запускаем приложение
-    // if(check == 0) {
+    // Если приложение
+    // if(directory->entity[directory->highlight - 1].type == DT_REG) {
     //     pid_t pid = fork();
         
     //     if(pid == 0) {
     //         endwin();
-    //         execl(directory->choices[directory->highlight - 1], directory->choices[directory->highlight - 1], NULL);
+    //         execl(directory->entity[directory->highlight - 1].name, directory->entity[directory->highlight - 1].name, NULL);
     //         exit(0);
     //     }
 
@@ -30,13 +25,14 @@ void enterFunc(struct Directory_struct *directory, int win_tab) {
     //     displayFunc(directory, win_tab);
     // }
     
-    refresh();
+    // refresh();
+    // updateSubwindow(directory, win_tab);
 }
 
 void switchFunc(struct Directory_struct directory[2], struct Tab_struct tabs[3], int *cycle, int *win_tab) {
     char tmp[ARR_SIZE * 2];
-    char path_r[ARR_SIZE];
-    char path_w[ARR_SIZE];
+    // char path_r[ARR_SIZE];
+    // char path_w[ARR_SIZE];
 
     int input = wgetch(directory[*win_tab].window);
 

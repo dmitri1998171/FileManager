@@ -26,12 +26,12 @@
 
 	#define LOG_NUM(log_level, x)           \
         ( (log_level == LOG_DEBUG) ?        \
-            (fprintf(fdw, "%s, %s: %d\n", #log_level, #x, x)) :\
+            (fprintf(fdw, "%s | %s():%d | %s | %s= %d\n", __FILE__, __FUNCTION__, __LINE__, #log_level, #x, x)) :\
             (fprintf(fdw, "%s, %d\n", #log_level, x)) ); 
 
 	#define LOG_CHAR(log_level, x)   	    \
         ( (log_level == LOG_DEBUG) ? 		\
-            (fprintf(fdw, "%s, %s: %s\n", #log_level, #x, x)) :\
+            (fprintf(fdw, "%s | %s():%d | %s | %s= %d\n", __FILE__, __FUNCTION__, __LINE__, #log_level, #x, x)) :\
             (fprintf(fdw, "%s\n", x)) );		
 #else
 	#define LOG(x) 
@@ -50,10 +50,10 @@ pthread_t tid1, tid2;
 pthread_mutex_t mutex;
 
 struct Directory_struct {
-    int size;                       // Обшее кол-во файлов в текущ. директории
+    int size;                       // Обшее кол-во сушностей в текущ. директории
     char path[ARR_SIZE];            // Путь к текущ. директории
-    struct Entity_struct *entity;
-    int highlight;
+    struct Entity_struct *entity;   // Сущность: папка, файл, ссылка
+    int highlight;                  // Выделенный элемент
     WINDOW *window;
     PANEL  *panel;
 };

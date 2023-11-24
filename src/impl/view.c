@@ -27,7 +27,7 @@ void printList(struct Directory_struct directory[2], int win_tab) {
 		}
 		else
 			mvwprintw(directory[win_tab].window, y, x, "%s", directory[win_tab].entity[i].name);
-        
+
 		y++;
     }
 
@@ -111,12 +111,8 @@ void displayFunc(struct Directory_struct directory[2], int win_tab) {
     directory[1].panel = new_panel(directory[1].window);
 
     for (int i = 0; i < 2; i++) {
+        // directory[i].panel = new_panel(directory[i].window);
         keypad(directory[i].window, TRUE);
-	
-        directory[i].size = 0;
-    	directory[i].entity = (struct Entity_struct*) malloc(sizeof(struct Entity_struct));
-    	directory[i].highlight = 1;
-
         updateSubwindow(directory, i);
 	}
 }
@@ -136,7 +132,7 @@ inline void updateSubwindow(struct Directory_struct directory[2], int win_tab) {
     getcwd(directory[win_tab].path, ARR_SIZE);         // Получ. путь
     scaner(directory, win_tab);                        // Сканируем директорию
     redrawSubwindow(directory, win_tab);               // Отрисовываем подокно
-    printList(directory, win_tab);	                    // Выводим на экран список файлов
+    printList(directory, win_tab);	                   // Выводим на экран список файлов
 }
 
 void *progressBar(void *param) {
