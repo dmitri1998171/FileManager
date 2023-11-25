@@ -97,7 +97,6 @@ void switchFunc(struct Directory_struct directory[2], struct Tab_struct tabs[3],
             break;
 
         case KEY_F(8):
-            LOG_CHAR(LOG_INFO, directory[*win_tab].entity[directory[*win_tab].highlight - 1].name)
             snprintf(tmp, ARR_SIZE + 7, "rm -rf %s", directory[*win_tab].entity[directory[*win_tab].highlight - 1].name);
 
             system(tmp);

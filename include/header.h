@@ -4,6 +4,7 @@
 #include <unistd.h> 
 #include <stdio.h>
 #include <stdlib.h> 
+#include <ctype.h> 
 #include <string.h> 
 #include <errno.h>
 #include <fcntl.h> 
@@ -30,6 +31,11 @@
             (fprintf(fdw, "%s, %d\n", #log_level, x)) ); 
 
 	#define LOG_CHAR(log_level, x)   	    \
+        ( (log_level == LOG_DEBUG) ? 		\
+            (fprintf(fdw, "%s | %s():%d | %s | %s= %c\n", __FILE__, __FUNCTION__, __LINE__, #log_level, #x, x)) :\
+            (fprintf(fdw, "%s\n", x)) );	
+
+	#define LOG_STR(log_level, x)   	    \
         ( (log_level == LOG_DEBUG) ? 		\
             (fprintf(fdw, "%s | %s():%d | %s | %s= %s\n", __FILE__, __FUNCTION__, __LINE__, #log_level, #x, x)) :\
             (fprintf(fdw, "%s\n", x)) );		
@@ -90,6 +96,11 @@ int panel_state;
 // model.c
 void scaner(struct Directory_struct directory[2], int win_tab);
 int countLines(char **arr, int totalLines);
+void sortByAlpha(struct Directory_struct directory[2]);
+void sortByType(struct Directory_struct directory[2]);
+void sortBySize(struct Directory_struct directory[2], bool direction);
+void sortByTime(struct Directory_struct directory[2]);
+void bubbleSort(struct Entity_struct list[], int size);
 
 // view.c
 int colornum(int fg, int bg);

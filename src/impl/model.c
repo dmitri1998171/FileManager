@@ -73,3 +73,84 @@ void scaner(struct Directory_struct directory[2], int win_tab) {
 
 	closedir(dir);
 }
+
+void merge(struct Entity_struct list[],int start, int end, int mid) {
+	int mergedList[255];
+	int i, j, k;
+	i = start;
+	k = start;
+	j = mid + 1;
+	
+	while (i <= mid && j <= end) {
+		if (list[i].name[0] < list[j].name[0]) {
+			mergedList[k] = list[i].name[0];
+			k++;
+			i++;
+		}
+		else {
+			mergedList[k] = list[j].name[0];
+			k++;
+			j++;
+		}
+	}
+	
+	while (i <= mid) {
+		mergedList[k] = list[i].name[0];
+		k++;
+		i++;
+	}
+	
+	while (j <= end) {
+		mergedList[k] = list[j].name[0];
+		k++;
+		j++;
+	}
+	
+	for (i = start; i < k; i++) {
+		list[i].name[0] = mergedList[i];
+	}
+}
+
+void mergeSort(struct Entity_struct list[], int start, int end) {
+	int mid;
+
+	if (start < end) {
+		mid = (start + end) / 2;
+		mergeSort(list, start, mid);
+		mergeSort(list, mid + 1, end);
+		merge(list, start, end, mid);
+	}
+}
+
+void bubbleSort(struct Entity_struct list[], int size) {
+	struct Entity_struct tmp;
+
+	for (size_t idx_i = 0; idx_i + 1 < size; ++idx_i) {
+		for (size_t idx_j = 0; idx_j + 1 < size - idx_i; ++idx_j) {
+			if (tolower(list[idx_j + 1].name[0]) < tolower(list[idx_j].name[0])) {
+				tmp = list[idx_j + 1];
+				list[idx_j + 1] = list[idx_j];
+				list[idx_j] = tmp;
+			}
+		}
+	}
+}
+
+void sortByAlpha(struct Directory_struct directory[2]) {
+	bubbleSort(directory[0].entity, directory[0].size);
+	bubbleSort(directory[1].entity, directory[1].size);
+}
+
+void sortByType(struct Directory_struct directory[2]) {
+
+}
+
+void sortBySize(struct Directory_struct directory[2], bool direction) {
+
+}
+
+void sortByTime(struct Directory_struct directory[2]) {
+
+}
+
+
