@@ -31,7 +31,7 @@
 
 	#define LOG_CHAR(log_level, x)   	    \
         ( (log_level == LOG_DEBUG) ? 		\
-            (fprintf(fdw, "%s | %s():%d | %s | %s= %d\n", __FILE__, __FUNCTION__, __LINE__, #log_level, #x, x)) :\
+            (fprintf(fdw, "%s | %s():%d | %s | %s= %s\n", __FILE__, __FUNCTION__, __LINE__, #log_level, #x, x)) :\
             (fprintf(fdw, "%s\n", x)) );		
 #else
 	#define LOG(x) 
@@ -101,6 +101,8 @@ void displayFunc(struct Directory_struct directory[2], int win_tab);
 void redrawSubwindow(struct Directory_struct directory[2], int win_tab);
 void updateSubwindow(struct Directory_struct directory[2], int win_tab);
 void *progressBar(void *param);
+void addElem(struct Tab_struct tabs[3], int panel, char* str);
+void init_tabs(struct Directory_struct directory[2], struct Tab_struct tabs[3], int win_tab);
 
 // controller.c
 void enterFunc(struct Directory_struct *directory, int win_tab);

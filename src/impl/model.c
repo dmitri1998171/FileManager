@@ -40,7 +40,6 @@ void scaner(struct Directory_struct directory[2], int win_tab) {
     DIR *dir;
 
 	EntCounter entCounter = entitiesCount(directory[win_tab].path);
-	LOG_NUM(LOG_DEBUG, entCounter.total)
 	
 	dir = opendir(directory[win_tab].path);
 	if(dir == NULL) { 
@@ -54,7 +53,7 @@ void scaner(struct Directory_struct directory[2], int win_tab) {
 
 	directory[win_tab].size = 0;
 	directory[win_tab].highlight = 1;
-	directory[win_tab].entity = (struct Entity_struct*) malloc(sizeof(struct Entity_struct) * directory[win_tab].size);
+	directory[win_tab].entity = (struct Entity_struct*) malloc(sizeof(struct Entity_struct) * entCounter.total);
 
 	while((dir_struct_t = readdir(dir))) {
 		struct stat attrib;

@@ -6,33 +6,32 @@ void enterFunc(struct Directory_struct directory[2], int win_tab) {
     // Если директория
     if(directory[win_tab].entity[directory[win_tab].highlight - 1].type == DT_DIR) {
         chdir(directory[win_tab].entity[directory[win_tab].highlight - 1].name);
+        getcwd(directory[win_tab].path, ARR_SIZE);         // Получ. путь
+        
         updateSubwindow(directory, win_tab);
 
         directory[win_tab].highlight = 1;
     }
 
     // Если приложение
-    // if(directory->entity[directory->highlight - 1].type == DT_REG) {
-    //     pid_t pid = fork();
+    if(directory[win_tab].entity[directory[win_tab].highlight - 1].type == DT_REG) {
+        pid_t pid = fork();
         
-    //     if(pid == 0) {
-    //         endwin();
-    //         execl(directory->entity[directory->highlight - 1].name, directory->entity[directory->highlight - 1].name, NULL);
-    //         exit(0);
-    //     }
+        if(pid == 0) {
+            endwin();
+            execl(directory[win_tab].entity[directory[win_tab].highlight - 1].name, directory[win_tab].entity[directory[win_tab].highlight - 1].name, NULL);
+            exit(0);
+        }
 
-    //     wait(&pid);
-    //     displayFunc(directory, win_tab);
-    // }
-    
-    // refresh();
-    // updateSubwindow(directory, win_tab);
+        wait(&pid);
+        displayFunc(directory, win_tab);
+    }
 }
 
 void switchFunc(struct Directory_struct directory[2], struct Tab_struct tabs[3], int *cycle, int *win_tab) {
     char tmp[ARR_SIZE * 2];
-    // char path_r[ARR_SIZE];
-    // char path_w[ARR_SIZE];
+    char path_r[ARR_SIZE];
+    char path_w[ARR_SIZE];
 
     int input = wgetch(directory[*win_tab].window);
 
@@ -80,35 +79,30 @@ void switchFunc(struct Directory_struct directory[2], struct Tab_struct tabs[3],
             break;
 
         case KEY_F(5):
-            // pthreadStruct.filename = directory[*win_tab].choices[directory[*win_tab].highlight - 1];
-            // pthreadStruct.pBarName = "Copy: "; 
+            pthreadStruct.filename = directory[*win_tab].entity[directory[*win_tab].highlight - 1].name;
+            pthreadStruct.pBarName = "Copy: ";
 
-            // pthread_create(&tid2, NULL, progressBar, &pthreadStruct);
+            pthread_create(&tid2, NULL, progressBar, &pthreadStruct);
 
-            // snprintf(path_r, sizeof(path_r), "%s/%s", directory[*win_tab].path, directory[*win_tab].choices[directory[*win_tab].highlight - 1]);
-            // renameFunc(directory[*win_tab].choices[directory[*win_tab].highlight - 1], path_w);
-            // snprintf(tmp, sizeof(path_r) + sizeof(directory[*win_tab].path), "cp %s %s/%s", path_r, directory[*win_tab].path, path_w);
+            snprintf(path_r, sizeof(path_r), "%s/%s", directory[*win_tab].path, directory[*win_tab].entity[directory[*win_tab].highlight - 1].name);
+            renameFunc(directory[*win_tab].entity[directory[*win_tab].highlight - 1].name, path_w);
+            snprintf(tmp, sizeof(path_r) + sizeof(directory[*win_tab].path), "cp %s %s/%s", path_r, directory[*win_tab].path, path_w);
             
-            // system(tmp);
-
+            system(tmp);
             pthread_join(tid2, NULL);
 
-            /*
-                Передается только один элемент массива структур.
-                Чтобы обновить второй нужно его достать - где ???
-            */ 
-
-            LOG_NUM(LOG_DEBUG, *win_tab)
-            updateSubwindow(directory, *win_tab);
-            updateSubwindow(directory, *win_tab);
+            updateSubwindow(directory, 0);
+            updateSubwindow(directory, 1);
+            
             break;
 
         case KEY_F(8):
-            // snprintf(tmp, ARR_SIZE + 7, "rm -rf %s", directory[*win_tab].choices[directory->highlight - 1]);
+            LOG_CHAR(LOG_INFO, directory[*win_tab].entity[directory[*win_tab].highlight - 1].name)
+            snprintf(tmp, ARR_SIZE + 7, "rm -rf %s", directory[*win_tab].entity[directory[*win_tab].highlight - 1].name);
 
             system(tmp);
-
-            updateSubwindow(directory, *win_tab);
+            updateSubwindow(directory, 0);
+            updateSubwindow(directory, 1);
             break;
 
         case 9:                                     // Tab button
