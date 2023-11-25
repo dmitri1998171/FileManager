@@ -92,6 +92,9 @@ void scaner(struct Directory_struct directory[2], int win_tab);
 int countLines(char **arr, int totalLines);
 
 // view.c
+int colornum(int fg, int bg);
+short curs_color(int fg);
+void init_colorpairs();
 void init();
 void printList(struct Directory_struct directory[2], int win_tab);
 void showTabButtons(struct Tab_struct tabs[3]);

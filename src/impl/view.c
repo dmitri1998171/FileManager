@@ -2,12 +2,61 @@
 
 #define BORDER 2
 
+// 0 ... 15
+inline int colornum(int fg, int bg) {
+    int B, bbb, ffff;
+
+    B = 1 << 7;
+    bbb = (7 & bg) << 4;
+    ffff = 7 & fg;
+
+    return (B | bbb | ffff);
+}
+
+inline short curs_color(int fg) {
+    switch (7 & fg) {           /* RGB */
+        case 0:                     /* 000 */
+            return (COLOR_BLACK);
+        case 1:                     /* 001 */
+            return (COLOR_BLUE);
+        case 2:                     /* 010 */
+            return (COLOR_GREEN);
+        case 3:                     /* 011 */
+            return (COLOR_CYAN);
+        case 4:                     /* 100 */
+            return (COLOR_RED);
+        case 5:                     /* 101 */
+            return (COLOR_MAGENTA);
+        case 6:                     /* 110 */
+            return (COLOR_YELLOW);
+        case 7:                     /* 111 */
+            return (COLOR_WHITE);
+    }
+
+    return 0;
+}
+
+inline void init_colorpairs() {
+    int fg, bg;
+    int colorpair;
+
+    for (bg = 0; bg <= 7; bg++) {
+        for (fg = 0; fg <= 7; fg++) {
+            colorpair = colornum(fg, bg);
+            init_pair(colorpair, curs_color(fg), curs_color(bg));
+        }
+    }
+}
+
 inline void init() {
     initscr();
     curs_set(0);
     start_color();
 	noecho();
 	cbreak();
+    
+    init_colorpairs();
+
     init_color(COLOR_BLACK, 140, 140, 140); 
     init_pair(1, COLOR_RED, COLOR_BLACK);
     init_pair(2, COLOR_WHITE, COLOR_RED);
@@ -25,8 +74,15 @@ void printList(struct Directory_struct directory[2], int win_tab) {
 			mvwprintw(directory[win_tab].window, y, x, "%s", directory[win_tab].entity[i].name);
             wattroff(directory[win_tab].window, COLOR_PAIR(2) | A_BOLD);
 		}
-		else
-			mvwprintw(directory[win_tab].window, y, x, "%s", directory[win_tab].entity[i].name);
+		else {
+            if(directory[win_tab].entity[i].type == DT_DIR) {
+                wattron(directory[win_tab].window, COLOR_PAIR(colornum(11, 8)) | A_BOLD); 
+                mvwprintw(directory[win_tab].window, y, x, "%s", directory[win_tab].entity[i].name);
+                wattroff(directory[win_tab].window, COLOR_PAIR(colornum(11, 8)) | A_BOLD);
+            } else {
+			    mvwprintw(directory[win_tab].window, y, x, "%s", directory[win_tab].entity[i].name);
+            }
+        }
 
 		y++;
     }
@@ -85,7 +141,6 @@ inline void printTitle(WINDOW *win, int starty, int startx, int width, char stri
 
 void displayFunc(struct Directory_struct directory[2], int win_tab) {
     init();
-
 	chdir(".");									// Устан. путь
 
     // Создание кнопок и hotkeys
