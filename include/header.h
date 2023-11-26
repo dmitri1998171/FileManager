@@ -55,7 +55,16 @@
 pthread_t tid1, tid2;
 pthread_mutex_t mutex;
 
+// Структура для подсчета кол-ва эл-ов в директории
+typedef struct EntitiesCounterStruct {
+	int fileCounter;
+	int dirCounter;
+	int linkCounter;
+	int total;
+} EntCounter;
+
 struct Directory_struct {
+    EntCounter entCounter;
     int size;                       // Обшее кол-во сушностей в текущ. директории
     char path[ARR_SIZE];            // Путь к текущ. директории
     struct Entity_struct *entity;   // Сущность: папка, файл, ссылка
@@ -96,11 +105,11 @@ int panel_state;
 // model.c
 void scaner(struct Directory_struct directory[2], int win_tab);
 int countLines(char **arr, int totalLines);
-void sortByAlpha(struct Directory_struct directory[2]);
-void sortByType(struct Directory_struct directory[2]);
+void bubbleSort(struct Entity_struct list[], int size);
+void sortByAlpha(struct Directory_struct directory[2], int win_tab);
+void sortByType(struct Directory_struct directory[2], int win_tab);
 void sortBySize(struct Directory_struct directory[2], bool direction);
 void sortByTime(struct Directory_struct directory[2]);
-void bubbleSort(struct Entity_struct list[], int size);
 
 // view.c
 int colornum(int fg, int bg);

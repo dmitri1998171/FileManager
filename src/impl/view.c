@@ -183,7 +183,8 @@ void redrawSubwindow(struct Directory_struct directory[2], int win_tab) {
 
 inline void updateSubwindow(struct Directory_struct directory[2], int win_tab) {
     scaner(directory, win_tab);                        // Сканируем директорию
-    sortByAlpha(directory);                            // Сортировка
+    // sortByAlpha(directory, win_tab);                            // Сортировка
+    sortByType(directory, win_tab);                            // Сортировка
     redrawSubwindow(directory, win_tab);               // Отрисовываем подокно
     printList(directory, win_tab);	                   // Выводим на экран список файлов
 }

@@ -1,13 +1,5 @@
 #include "../../include/header.h"
 
-// Структура для подсчета кол-ва эл-ов в директории
-typedef struct EntitiesCounterStruct {
-	int fileCounter;
-	int dirCounter;
-	int linkCounter;
-	int total;
-} EntCounter;
-
 EntCounter entitiesCount(const char* path) {
 	EntCounter entCounter;
 	entCounter.dirCounter = 0;
@@ -51,6 +43,7 @@ void scaner(struct Directory_struct directory[2], int win_tab) {
 		free(directory[win_tab].entity);
 	}
 
+	directory[win_tab].entCounter = entCounter;
 	directory[win_tab].size = 0;
 	directory[win_tab].highlight = 1;
 	directory[win_tab].entity = (struct Entity_struct*) malloc(sizeof(struct Entity_struct) * entCounter.total);
@@ -74,55 +67,7 @@ void scaner(struct Directory_struct directory[2], int win_tab) {
 	closedir(dir);
 }
 
-void merge(struct Entity_struct list[],int start, int end, int mid) {
-	int mergedList[255];
-	int i, j, k;
-	i = start;
-	k = start;
-	j = mid + 1;
-	
-	while (i <= mid && j <= end) {
-		if (list[i].name[0] < list[j].name[0]) {
-			mergedList[k] = list[i].name[0];
-			k++;
-			i++;
-		}
-		else {
-			mergedList[k] = list[j].name[0];
-			k++;
-			j++;
-		}
-	}
-	
-	while (i <= mid) {
-		mergedList[k] = list[i].name[0];
-		k++;
-		i++;
-	}
-	
-	while (j <= end) {
-		mergedList[k] = list[j].name[0];
-		k++;
-		j++;
-	}
-	
-	for (i = start; i < k; i++) {
-		list[i].name[0] = mergedList[i];
-	}
-}
-
-void mergeSort(struct Entity_struct list[], int start, int end) {
-	int mid;
-
-	if (start < end) {
-		mid = (start + end) / 2;
-		mergeSort(list, start, mid);
-		mergeSort(list, mid + 1, end);
-		merge(list, start, end, mid);
-	}
-}
-
-void bubbleSort(struct Entity_struct list[], int size) {
+inline void bubbleSort(struct Entity_struct list[], int size) {
 	struct Entity_struct tmp;
 
 	for (size_t idx_i = 0; idx_i + 1 < size; ++idx_i) {
@@ -136,13 +81,36 @@ void bubbleSort(struct Entity_struct list[], int size) {
 	}
 }
 
-void sortByAlpha(struct Directory_struct directory[2]) {
-	bubbleSort(directory[0].entity, directory[0].size);
-	bubbleSort(directory[1].entity, directory[1].size);
+inline void sortByAlpha(struct Directory_struct directory[2], int win_tab) {
+	bubbleSort(directory[win_tab].entity, directory[win_tab].size);
 }
 
-void sortByType(struct Directory_struct directory[2]) {
+void sortByType(struct Directory_struct directory[2], int win_tab) {
+	struct Entity_struct folders[directory[win_tab].entCounter.dirCounter];
+	struct Entity_struct files[(directory[win_tab].entCounter.fileCounter + directory[win_tab].entCounter.linkCounter)];
+	int folCounter = 0, fileCounter = 0;
 
+// Split entities by type
+	for (int i = 0; i < directory[win_tab].size; i++) {
+		if(directory[win_tab].entity[i].type == DT_DIR) {
+			folders[folCounter++] = directory[win_tab].entity[i];
+		} else {
+			files[fileCounter++] = directory[win_tab].entity[i];
+		}
+	}
+	
+// Sort every type of entities individually 
+	bubbleSort(folders, folCounter);
+	bubbleSort(files, fileCounter);
+
+// Merge all entities
+	int totalCounter = 0;
+
+	for (int i = 0; i < folCounter; i++) 
+		directory[win_tab].entity[totalCounter++] = folders[i];
+
+	for (int i = 0; i < fileCounter; i++) 
+		directory[win_tab].entity[totalCounter++] = files[i];
 }
 
 void sortBySize(struct Directory_struct directory[2], bool direction) {
