@@ -66,7 +66,8 @@ typedef struct EntitiesCounter_struct {
 typedef struct Entity_struct {
     unsigned char type;
     int size;
-    char modify_time[MOD_TIME_SIZE];
+    // char modify_time[MOD_TIME_SIZE];
+    long modify_time;
     char name[STR_SIZE];
 }Entity;
 
@@ -108,7 +109,7 @@ void bubbleSort(Entity list[], int size);
 void sortByAlpha(Directory directory[2], int win_tab);
 void sortByType(Directory directory[2], int win_tab);
 void sortBySize(Directory directory[2], int win_tab, bool direction);
-void sortByTime(Directory directory[2]);
+void sortByTime(Directory directory[2], int win_tab, bool min);
 
 // view.c
 int colornum(int fg, int bg);

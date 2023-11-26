@@ -57,7 +57,8 @@ void scaner(Directory directory[2], int win_tab) {
 
 		directory[win_tab].entity[ i ].type = dir_struct_t->d_type;
 		directory[win_tab].entity[ i ].size = attrib.st_size;
-		strftime(directory[win_tab].entity[ i ].modify_time, MOD_TIME_SIZE, "%b %d %X", localtime(&(attrib.st_ctime)));
+		// strftime(directory[win_tab].entity[ i ].modify_time, MOD_TIME_SIZE, "%b %d %X", localtime(&(attrib.st_ctime)));
+		directory[win_tab].entity[ i ].modify_time = attrib.st_ctime;
         strcpy(directory[win_tab].entity[ i ].name, dir_struct_t->d_name);
 		
 		i++;
@@ -139,8 +140,34 @@ void sortBySize(Directory directory[2], int win_tab, bool min) {
 	}
 }
 
-void sortByTime(Directory directory[2]) {
+void sortByTime(Directory directory[2], int win_tab, bool min) {
+	Entity tmp;
 
+	if(min) {
+		for (size_t i = 0; i + 1 < directory[win_tab].counter.total; ++i) {
+			char *str = malloc(STR_SIZE);
+			snprintf(str, STR_SIZE, "%s %ld", directory[win_tab].entity[i].name, directory[win_tab].entity[i].modify_time);
+			LOG_STR(LOG_INFO, str)
+
+			for (size_t j = 0; j + 1 < directory[win_tab].counter.total - i; ++j) {
+				if (directory[win_tab].entity[j + 1].modify_time > directory[win_tab].entity[j].modify_time) {
+					tmp = directory[win_tab].entity[j + 1];
+					directory[win_tab].entity[j + 1] = directory[win_tab].entity[j];
+					directory[win_tab].entity[j] = tmp;
+				}
+			}
+		}
+	} else {
+		for (size_t i = 0; i + 1 < directory[win_tab].counter.total; ++i) {
+			for (size_t j = 0; j + 1 < directory[win_tab].counter.total - i; ++j) {
+				if (directory[win_tab].entity[j + 1].modify_time < directory[win_tab].entity[j].modify_time) {
+					tmp = directory[win_tab].entity[j + 1];
+					directory[win_tab].entity[j + 1] = directory[win_tab].entity[j];
+					directory[win_tab].entity[j] = tmp;
+				}
+			}
+		}
+	}
 }
 
 
