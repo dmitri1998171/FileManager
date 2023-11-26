@@ -107,7 +107,7 @@ int countLines(char **arr, int totalLines);
 void bubbleSort(Entity list[], int size);
 void sortByAlpha(Directory directory[2], int win_tab);
 void sortByType(Directory directory[2], int win_tab);
-void sortBySize(Directory directory[2], bool direction);
+void sortBySize(Directory directory[2], int win_tab, bool direction);
 void sortByTime(Directory directory[2]);
 
 // view.c

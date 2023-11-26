@@ -184,7 +184,8 @@ void redrawSubwindow(Directory directory[2], int win_tab) {
 inline void updateSubwindow(Directory directory[2], int win_tab) {
     scaner(directory, win_tab);                        // Сканируем директорию
     // sortByAlpha(directory, win_tab);                            // Сортировка
-    sortByType(directory, win_tab);                            // Сортировка
+    // sortByType(directory, win_tab);                            // Сортировка
+    sortBySize(directory, win_tab, false);
     redrawSubwindow(directory, win_tab);               // Отрисовываем подокно
     printList(directory, win_tab);	                   // Выводим на экран список файлов
 }

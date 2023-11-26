@@ -56,7 +56,7 @@ void scaner(Directory directory[2], int win_tab) {
 	    }
 
 		directory[win_tab].entity[ i ].type = dir_struct_t->d_type;
-		directory[win_tab].entity[ i ].size = dir_struct_t->d_reclen;
+		directory[win_tab].entity[ i ].size = attrib.st_size;
 		strftime(directory[win_tab].entity[ i ].modify_time, MOD_TIME_SIZE, "%b %d %X", localtime(&(attrib.st_ctime)));
         strcpy(directory[win_tab].entity[ i ].name, dir_struct_t->d_name);
 		
@@ -70,12 +70,12 @@ void scaner(Directory directory[2], int win_tab) {
 inline void bubbleSort(Entity list[], int size) {
 	Entity tmp;
 
-	for (size_t idx_i = 0; idx_i + 1 < size; ++idx_i) {
-		for (size_t idx_j = 0; idx_j + 1 < size - idx_i; ++idx_j) {
-			if (tolower(list[idx_j + 1].name[0]) < tolower(list[idx_j].name[0])) {
-				tmp = list[idx_j + 1];
-				list[idx_j + 1] = list[idx_j];
-				list[idx_j] = tmp;
+	for (size_t i = 0; i + 1 < size; ++i) {
+		for (size_t j = 0; j + 1 < size - i; ++j) {
+			if (tolower(list[j + 1].name[0]) < tolower(list[j].name[0])) {
+				tmp = list[j + 1];
+				list[j + 1] = list[j];
+				list[j] = tmp;
 			}
 		}
 	}
@@ -113,8 +113,30 @@ void sortByType(Directory directory[2], int win_tab) {
 		directory[win_tab].entity[totalCounter++] = files[i];
 }
 
-void sortBySize(Directory directory[2], bool direction) {
+void sortBySize(Directory directory[2], int win_tab, bool min) {
+	Entity tmp;
 
+	if(min) {
+		for (size_t i = 0; i + 1 < directory[win_tab].counter.total; ++i) {
+			for (size_t j = 0; j + 1 < directory[win_tab].counter.total - i; ++j) {
+				if (directory[win_tab].entity[j + 1].size < directory[win_tab].entity[j].size) {
+					tmp = directory[win_tab].entity[j + 1];
+					directory[win_tab].entity[j + 1] = directory[win_tab].entity[j];
+					directory[win_tab].entity[j] = tmp;
+				}
+			}
+		}
+	} else {
+		for (size_t i = 0; i + 1 < directory[win_tab].counter.total; ++i) {
+			for (size_t j = 0; j + 1 < directory[win_tab].counter.total - i; ++j) {
+				if (directory[win_tab].entity[j + 1].size > directory[win_tab].entity[j].size) {
+					tmp = directory[win_tab].entity[j + 1];
+					directory[win_tab].entity[j + 1] = directory[win_tab].entity[j];
+					directory[win_tab].entity[j] = tmp;
+				}
+			}
+		}
+	}
 }
 
 void sortByTime(Directory directory[2]) {
