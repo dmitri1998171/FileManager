@@ -65,22 +65,35 @@ inline void init() {
 }
 
 void printList(Directory directory[2], int win_tab) {
-	int x = 2, y = 3;
+	int x = 2, y = 4;
+    char str[MOD_TIME_SIZE];
 
     for (int i = 0; i < directory[win_tab].counter.total; i++) {
 		// Highlight the present choice 
 		if(directory[win_tab].highlight == i + 1) { 
             wattron(directory[win_tab].window, COLOR_PAIR(2) | A_BOLD); 
 			mvwprintw(directory[win_tab].window, y, x, "%s", directory[win_tab].entity[i].name);
+            mvwprintw(directory[win_tab].window, y, (COLS/2) - 18, "%d", directory[win_tab].entity[i].size);
+
+            strftime(str, MOD_TIME_SIZE, "%b %d %H:%M", localtime(&(directory[win_tab].entity[i].modify_time)));
+            mvwprintw(directory[win_tab].window, y, (COLS/2) - 14, "%s", str);
             wattroff(directory[win_tab].window, COLOR_PAIR(2) | A_BOLD);
 		}
 		else {
             if(directory[win_tab].entity[i].type == DT_DIR) {
                 wattron(directory[win_tab].window, COLOR_PAIR(colornum(11, 8)) | A_BOLD); 
                 mvwprintw(directory[win_tab].window, y, x, "%s", directory[win_tab].entity[i].name);
+                mvwprintw(directory[win_tab].window, y, (COLS/2) - 18, "%d", directory[win_tab].entity[i].size);
+
+        		strftime(str, MOD_TIME_SIZE, "%b %d %H:%M", localtime(&(directory[win_tab].entity[i].modify_time)));
+                mvwprintw(directory[win_tab].window, y, (COLS/2) - 14, "%s", str);
                 wattroff(directory[win_tab].window, COLOR_PAIR(colornum(11, 8)) | A_BOLD);
             } else {
 			    mvwprintw(directory[win_tab].window, y, x, "%s", directory[win_tab].entity[i].name);
+                mvwprintw(directory[win_tab].window, y, (COLS/2) - 18, "%d", directory[win_tab].entity[i].size);
+                
+                strftime(str, MOD_TIME_SIZE, "%b %d %H:%M", localtime(&(directory[win_tab].entity[i].modify_time)));
+                mvwprintw(directory[win_tab].window, y, (COLS/2) - 14, "%s", str);
             }
         }
 
@@ -115,6 +128,17 @@ void showTabButtons(Tab tabs[3]) {
 inline void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w) {
     box(wnd, box_y, box_x);
 	mvwhline(wnd, line_y, line_x, ACS_HLINE, line_w);
+
+    for (int i = line_y + 1; i < LINES - 5; i++) {
+        mvwhline(wnd, i, (COLS/2) - 15, ACS_VLINE, 1);
+        mvwhline(wnd, i, (COLS/2) - 22, ACS_VLINE, 1);
+    }
+
+    wattron(wnd, COLOR_PAIR(colornum(6, 8)));
+    mvwprintw(wnd, line_y + 1, (((COLS/2) - 22) / 2) - 2, "Name");
+    mvwprintw(wnd, line_y + 1, (COLS/2) - 20, "Size");
+    mvwprintw(wnd, line_y + 1, (COLS/2) - 12, "Mod time");
+    wattroff(wnd, COLOR_PAIR(colornum(6, 8)));
 }
 
 inline void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color) {	
@@ -185,9 +209,9 @@ inline void updateSubwindow(Directory directory[2], int win_tab) {
     scaner(directory, win_tab);                        // Сканируем директорию
     
     // sortByAlpha(directory, win_tab);                            // Сортировка
-    // sortByType(directory, win_tab);                            // Сортировка
+    sortByType(directory, win_tab);                            // Сортировка
     // sortBySize(directory, win_tab, false);
-    sortByTime(directory, win_tab, true);
+    // sortByTime(directory, win_tab, true);
 
     redrawSubwindow(directory, win_tab);               // Отрисовываем подокно
     printList(directory, win_tab);	                   // Выводим на экран список файлов

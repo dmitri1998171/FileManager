@@ -67,7 +67,7 @@ typedef struct Entity_struct {
     unsigned char type;
     int size;
     // char modify_time[MOD_TIME_SIZE];
-    long modify_time;
+    time_t modify_time;
     char name[STR_SIZE];
 }Entity;
 
