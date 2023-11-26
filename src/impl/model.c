@@ -1,37 +1,36 @@
 #include "../../include/header.h"
 
-EntCounter entitiesCount(const char* path) {
-	EntCounter entCounter;
-	entCounter.dirCounter = 0;
-	entCounter.fileCounter = 0;
-	entCounter.linkCounter = 0;
-	entCounter.total = 0;
+EntitiesCounter entitiesCount(const char* path) {
+	EntitiesCounter counter;
+	counter.dirCounter = 0;
+	counter.fileCounter = 0;
+	counter.linkCounter = 0;
+	counter.total = 0;
 
-	DIR * dirp;
+	DIR * dir;
 	struct dirent * entry;
 
-	dirp = opendir(path); 
-	while ((entry = readdir(dirp)) != NULL) {
-		entCounter.total++;
+	dir = opendir(path); 
+	while ((entry = readdir(dir)) != NULL) {
+		counter.total++;
 
 		if (entry->d_type == DT_REG) 
-			entCounter.fileCounter++;
+			counter.fileCounter++;
 
 		if (entry->d_type == DT_LNK) 
-			entCounter.linkCounter++;
+			counter.linkCounter++;
 	}
 
-	entCounter.dirCounter = entCounter.total - entCounter.fileCounter - entCounter.linkCounter;
-	closedir(dirp);
+	counter.dirCounter = counter.total - counter.fileCounter - counter.linkCounter;
+	closedir(dir);
 
-	return entCounter;
+	return counter;
 }
 
-void scaner(struct Directory_struct directory[2], int win_tab) {
+void scaner(Directory directory[2], int win_tab) {
 	struct dirent *dir_struct_t;
     DIR *dir;
 
-	EntCounter entCounter = entitiesCount(directory[win_tab].path);
 	
 	dir = opendir(directory[win_tab].path);
 	if(dir == NULL) { 
@@ -39,14 +38,14 @@ void scaner(struct Directory_struct directory[2], int win_tab) {
         exit(1); 
     }
 
-	if(directory[win_tab].size > 0) {
+	if(directory[win_tab].counter.total > 0) {
 		free(directory[win_tab].entity);
 	}
 
-	directory[win_tab].entCounter = entCounter;
-	directory[win_tab].size = 0;
+	int i = 0;
 	directory[win_tab].highlight = 1;
-	directory[win_tab].entity = (struct Entity_struct*) malloc(sizeof(struct Entity_struct) * entCounter.total);
+	directory[win_tab].counter = entitiesCount(directory[win_tab].path);
+	directory[win_tab].entity = (Entity*) malloc(sizeof(Entity) * directory[win_tab].counter.total);
 
 	while((dir_struct_t = readdir(dir))) {
 		struct stat attrib;
@@ -56,19 +55,20 @@ void scaner(struct Directory_struct directory[2], int win_tab) {
 			continue;
 	    }
 
-		directory[win_tab].entity[ directory[win_tab].size ].type = dir_struct_t->d_type;
-		directory[win_tab].entity[ directory[win_tab].size ].size = dir_struct_t->d_reclen;
-		strftime(directory[win_tab].entity[ directory[win_tab].size ].modify_time, MOD_TIME_SIZE, "%b %d %X", localtime(&(attrib.st_ctime)));
-        strcpy(directory[win_tab].entity[ directory[win_tab].size ].name, dir_struct_t->d_name);
+		directory[win_tab].entity[ i ].type = dir_struct_t->d_type;
+		directory[win_tab].entity[ i ].size = dir_struct_t->d_reclen;
+		strftime(directory[win_tab].entity[ i ].modify_time, MOD_TIME_SIZE, "%b %d %X", localtime(&(attrib.st_ctime)));
+        strcpy(directory[win_tab].entity[ i ].name, dir_struct_t->d_name);
 		
-		directory[win_tab].size++;
+		i++;
 	}
 
+	directory[win_tab].counter.total = i;
 	closedir(dir);
 }
 
-inline void bubbleSort(struct Entity_struct list[], int size) {
-	struct Entity_struct tmp;
+inline void bubbleSort(Entity list[], int size) {
+	Entity tmp;
 
 	for (size_t idx_i = 0; idx_i + 1 < size; ++idx_i) {
 		for (size_t idx_j = 0; idx_j + 1 < size - idx_i; ++idx_j) {
@@ -81,17 +81,17 @@ inline void bubbleSort(struct Entity_struct list[], int size) {
 	}
 }
 
-inline void sortByAlpha(struct Directory_struct directory[2], int win_tab) {
-	bubbleSort(directory[win_tab].entity, directory[win_tab].size);
+inline void sortByAlpha(Directory directory[2], int win_tab) {
+	bubbleSort(directory[win_tab].entity, directory[win_tab].counter.total);
 }
 
-void sortByType(struct Directory_struct directory[2], int win_tab) {
-	struct Entity_struct folders[directory[win_tab].entCounter.dirCounter];
-	struct Entity_struct files[(directory[win_tab].entCounter.fileCounter + directory[win_tab].entCounter.linkCounter)];
+void sortByType(Directory directory[2], int win_tab) {
+	Entity folders[directory[win_tab].counter.dirCounter];
+	Entity files[(directory[win_tab].counter.fileCounter + directory[win_tab].counter.linkCounter)];
 	int folCounter = 0, fileCounter = 0;
 
 // Split entities by type
-	for (int i = 0; i < directory[win_tab].size; i++) {
+	for (int i = 0; i < directory[win_tab].counter.total; i++) {
 		if(directory[win_tab].entity[i].type == DT_DIR) {
 			folders[folCounter++] = directory[win_tab].entity[i];
 		} else {
@@ -113,11 +113,11 @@ void sortByType(struct Directory_struct directory[2], int win_tab) {
 		directory[win_tab].entity[totalCounter++] = files[i];
 }
 
-void sortBySize(struct Directory_struct directory[2], bool direction) {
+void sortBySize(Directory directory[2], bool direction) {
 
 }
 
-void sortByTime(struct Directory_struct directory[2]) {
+void sortByTime(Directory directory[2]) {
 
 }
 

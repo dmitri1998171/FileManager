@@ -2,7 +2,7 @@
 
 #define CTRL(x) (x & 0x1F)
 
-void enterFunc(struct Directory_struct directory[2], int win_tab) {   
+void enterFunc(Directory directory[2], int win_tab) {   
     // Если директория
     if(directory[win_tab].entity[directory[win_tab].highlight - 1].type == DT_DIR) {
         chdir(directory[win_tab].entity[directory[win_tab].highlight - 1].name);
@@ -28,7 +28,7 @@ void enterFunc(struct Directory_struct directory[2], int win_tab) {
     }
 }
 
-void switchFunc(struct Directory_struct directory[2], struct Tab_struct tabs[3], int *cycle, int *win_tab) {
+void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
     char tmp[ARR_SIZE * 2];
     char path_r[ARR_SIZE];
     char path_w[ARR_SIZE];
@@ -38,7 +38,7 @@ void switchFunc(struct Directory_struct directory[2], struct Tab_struct tabs[3],
     switch(input) {
         case KEY_DOWN:
             if(panel_state == HIDE) {
-                if(directory[*win_tab].highlight == directory[*win_tab].size)
+                if(directory[*win_tab].highlight == directory[*win_tab].counter.total)
                     directory[*win_tab].highlight = 1;
                 else 
                     ++directory[*win_tab].highlight;  
@@ -58,7 +58,7 @@ void switchFunc(struct Directory_struct directory[2], struct Tab_struct tabs[3],
         case KEY_UP:
             if(panel_state == HIDE) {
                 if(directory[*win_tab].highlight == 1)
-                    directory[*win_tab].highlight = directory[*win_tab].size;
+                    directory[*win_tab].highlight = directory[*win_tab].counter.total;
                 else
                     --directory[*win_tab].highlight;
 
@@ -156,11 +156,11 @@ void switchFunc(struct Directory_struct directory[2], struct Tab_struct tabs[3],
         directory[*win_tab].highlight = 1;
     
     if(input == CTRL('d')) 
-        directory[*win_tab].highlight = directory[*win_tab].size;
+        directory[*win_tab].highlight = directory[*win_tab].counter.total;
 
 }
 
-inline void showTab(struct Directory_struct directory[2], struct Tab_struct tabs[3], int *win_tab) {
+inline void showTab(Directory directory[2], Tab tabs[3], int *win_tab) {
     for(int i = 0; i < 3; i++)
         hide_panel(tabs[i].panel);
 

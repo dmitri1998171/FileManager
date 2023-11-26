@@ -64,10 +64,10 @@ inline void init() {
     init_pair(4, COLOR_YELLOW, COLOR_RED);
 }
 
-void printList(struct Directory_struct directory[2], int win_tab) {
+void printList(Directory directory[2], int win_tab) {
 	int x = 2, y = 3;
 
-    for (int i = 0; i < directory[win_tab].size; i++) {
+    for (int i = 0; i < directory[win_tab].counter.total; i++) {
 		// Highlight the present choice 
 		if(directory[win_tab].highlight == i + 1) { 
             wattron(directory[win_tab].window, COLOR_PAIR(2) | A_BOLD); 
@@ -90,7 +90,7 @@ void printList(struct Directory_struct directory[2], int win_tab) {
 	wrefresh(directory[win_tab].window);
 }
 
-void showTabButtons(struct Tab_struct tabs[3]) {
+void showTabButtons(Tab tabs[3]) {
     int x = 1, y = 1;
 
     for (int i = 0; i < tabs[panel_state].linesCounter; i++) {
@@ -139,7 +139,7 @@ inline void printTitle(WINDOW *win, int starty, int startx, int width, char stri
 	refresh();
 }
 
-void displayFunc(struct Directory_struct directory[2], int win_tab) {
+void displayFunc(Directory directory[2], int win_tab) {
     init();
 	chdir(".");									// Устан. путь
 
@@ -170,7 +170,7 @@ void displayFunc(struct Directory_struct directory[2], int win_tab) {
 	}
 }
 
-void redrawSubwindow(struct Directory_struct directory[2], int win_tab) {
+void redrawSubwindow(Directory directory[2], int win_tab) {
     wclear(directory[win_tab].window);                 // Очищ. окно
     
     wattron(directory[win_tab].window,  A_BOLD); 
@@ -181,7 +181,7 @@ void redrawSubwindow(struct Directory_struct directory[2], int win_tab) {
     wrefresh(directory[win_tab].window);
 }
 
-inline void updateSubwindow(struct Directory_struct directory[2], int win_tab) {
+inline void updateSubwindow(Directory directory[2], int win_tab) {
     scaner(directory, win_tab);                        // Сканируем директорию
     // sortByAlpha(directory, win_tab);                            // Сортировка
     sortByType(directory, win_tab);                            // Сортировка
@@ -232,7 +232,7 @@ void *progressBar(void *param) {
     return NULL;
 }
 
-void addElem(struct Tab_struct tabs[3], int panel, char* str) {
+void addElem(Tab tabs[3], int panel, char* str) {
 	if(tabs[panel].linesCounter == 0) {
 		tabs[panel].panel_btns = (char**) malloc(sizeof(char*));
 
@@ -250,7 +250,7 @@ void addElem(struct Tab_struct tabs[3], int panel, char* str) {
 	tabs[panel].linesCounter++;
 }
 
-void init_tabs(struct Directory_struct directory[2], struct Tab_struct tabs[3], int win_tab) {	
+void init_tabs(Directory directory[2], Tab tabs[3], int win_tab) {	
 	for (int i = 0; i < 3; i++) {
 		tabs[i].win = newwin(NLINES, NCOLS, 2, 1 + (i * TAB_OFFSET));
 		wbkgd(tabs[i].win, COLOR_PAIR(3));

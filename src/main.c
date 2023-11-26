@@ -7,8 +7,8 @@ int main() {
 
 	int cycle = 1;
 	int win_tab = 0;
-	struct Directory_struct directory[2];			// 0 - Левое окно; 1 - правое окно
-	struct Tab_struct tabs[3];
+	Directory directory[2];			// 0 - Левое окно; 1 - правое окно
+	Tab tabs[3];
 
 	ESCDELAY = 0;									// Убирает задержку при нажатии Escape
 	panel_state = HIDE;

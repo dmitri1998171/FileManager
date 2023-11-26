@@ -56,37 +56,36 @@ pthread_t tid1, tid2;
 pthread_mutex_t mutex;
 
 // Структура для подсчета кол-ва эл-ов в директории
-typedef struct EntitiesCounterStruct {
+typedef struct EntitiesCounter_struct {
 	int fileCounter;
 	int dirCounter;
 	int linkCounter;
 	int total;
-} EntCounter;
+} EntitiesCounter;
 
-struct Directory_struct {
-    EntCounter entCounter;
-    int size;                       // Обшее кол-во сушностей в текущ. директории
-    char path[ARR_SIZE];            // Путь к текущ. директории
-    struct Entity_struct *entity;   // Сущность: папка, файл, ссылка
-    int highlight;                  // Выделенный элемент
-    WINDOW *window;
-    PANEL  *panel;
-};
-
-struct Entity_struct {
+typedef struct Entity_struct {
     unsigned char type;
     int size;
     char modify_time[MOD_TIME_SIZE];
     char name[STR_SIZE];
-};
+}Entity;
 
-struct Tab_struct {
+typedef struct Directory_struct {
+    EntitiesCounter counter;        // Обшее кол-во сушностей в текущ. директории
+    char path[ARR_SIZE];            // Путь к текущ. директории
+    Entity *entity;                 // Сущность: папка, файл, ссылка
+    int highlight;                  // Выделенный элемент
+    WINDOW *window;
+    PANEL  *panel;
+}Directory;
+
+typedef struct Tab_struct {
     int highlight;
     int linesCounter;
     char **panel_btns;
     WINDOW *win;
     PANEL  *panel;
-};
+}Tab;
 
 struct pthread_struct {
     char *filename;
@@ -103,34 +102,34 @@ enum panel_states {
 int panel_state;
 
 // model.c
-void scaner(struct Directory_struct directory[2], int win_tab);
+void scaner(Directory directory[2], int win_tab);
 int countLines(char **arr, int totalLines);
-void bubbleSort(struct Entity_struct list[], int size);
-void sortByAlpha(struct Directory_struct directory[2], int win_tab);
-void sortByType(struct Directory_struct directory[2], int win_tab);
-void sortBySize(struct Directory_struct directory[2], bool direction);
-void sortByTime(struct Directory_struct directory[2]);
+void bubbleSort(Entity list[], int size);
+void sortByAlpha(Directory directory[2], int win_tab);
+void sortByType(Directory directory[2], int win_tab);
+void sortBySize(Directory directory[2], bool direction);
+void sortByTime(Directory directory[2]);
 
 // view.c
 int colornum(int fg, int bg);
 short curs_color(int fg);
 void init_colorpairs();
 void init();
-void printList(struct Directory_struct directory[2], int win_tab);
-void showTabButtons(struct Tab_struct tabs[3]);
+void printList(Directory directory[2], int win_tab);
+void showTabButtons(Tab tabs[3]);
 void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w);
 void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color);
-void displayFunc(struct Directory_struct directory[2], int win_tab);
-void redrawSubwindow(struct Directory_struct directory[2], int win_tab);
-void updateSubwindow(struct Directory_struct directory[2], int win_tab);
+void displayFunc(Directory directory[2], int win_tab);
+void redrawSubwindow(Directory directory[2], int win_tab);
+void updateSubwindow(Directory directory[2], int win_tab);
 void *progressBar(void *param);
-void addElem(struct Tab_struct tabs[3], int panel, char* str);
-void init_tabs(struct Directory_struct directory[2], struct Tab_struct tabs[3], int win_tab);
+void addElem(Tab tabs[3], int panel, char* str);
+void init_tabs(Directory directory[2], Tab tabs[3], int win_tab);
 
 // controller.c
-void enterFunc(struct Directory_struct *directory, int win_tab);
-void switchFunc(struct Directory_struct directory[2], struct Tab_struct tabs[3], int *cycle, int *win_tab);
-void showTab(struct Directory_struct directory[2], struct Tab_struct tabs[3], int *win_tab);
+void enterFunc(Directory *directory, int win_tab);
+void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab);
+void showTab(Directory directory[2], Tab tabs[3], int *win_tab);
 
 // copy.c
 void renameFunc(char path_r[], char path_w[]);
