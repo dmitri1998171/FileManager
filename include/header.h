@@ -44,8 +44,9 @@
 #endif
 // ##############################
 
-#define NLINES 10
-#define NCOLS 20
+#define OPTNLINES 3
+#define NLINES 9
+#define NCOLS 25
 #define TAB_OFFSET 13
 #define MOD_TIME_SIZE 80
 #define STR_SIZE 255
@@ -124,7 +125,6 @@ void displayFunc(Directory directory[2], int win_tab);
 void redrawSubwindow(Directory directory[2], int win_tab);
 void updateSubwindow(Directory directory[2], int win_tab);
 void *progressBar(void *param);
-void addElem(Tab tabs[3], int panel, char* str);
 void init_tabs(Directory directory[2], Tab tabs[3], int win_tab);
 
 // controller.c

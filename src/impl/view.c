@@ -260,27 +260,27 @@ void *progressBar(void *param) {
     return NULL;
 }
 
-void addElem(Tab tabs[3], int panel, char* str) {
-	if(tabs[panel].linesCounter == 0) {
-		tabs[panel].panel_btns = (char**) malloc(sizeof(char*));
+void init_tabs(Directory directory[2], Tab tabs[3], int win_tab) {
+    char leftPanelLines[NLINES][NCOLS] = {
+        "View mode",
+        "Tree mode",
+        "List mode",
+        "Sort by Alphabet",
+        "Sort by Type",
+        "Sort by Size min",
+        "Sort by Size max",
+        "Sort by Mod time min",
+        "Sort by Mod time max"
+    };
 
-		for (int i = 0; i < sizeof(char**); i++)
-			tabs[panel].panel_btns[0] = (char*) malloc(sizeof(char*));
-		
-		strncpy(tabs[panel].panel_btns[0], str, NLINES);
-	} else {
-		tabs[panel].panel_btns = (char**) realloc(tabs[panel].panel_btns, sizeof(char*) * (tabs[panel].linesCounter + 1));
-		tabs[panel].panel_btns[tabs[panel].linesCounter] = (char*) malloc(sizeof(char*));
+    char optionsPanelLines[OPTNLINES][NCOLS] = {
+        "option_1",
+        "option_2",
+        "option_3"
+    };
 
-		strncpy(tabs[panel].panel_btns[tabs[panel].linesCounter], str, NLINES);
-	}
-
-	tabs[panel].linesCounter++;
-}
-
-void init_tabs(Directory directory[2], Tab tabs[3], int win_tab) {	
 	for (int i = 0; i < 3; i++) {
-		tabs[i].win = newwin(NLINES, NCOLS, 2, 1 + (i * TAB_OFFSET));
+		tabs[i].win = newwin(NLINES + 2, NCOLS, 2, 1 + (i * TAB_OFFSET));
 		wbkgd(tabs[i].win, COLOR_PAIR(3));
 		box(tabs[i].win, 0, 0);
 
@@ -289,19 +289,25 @@ void init_tabs(Directory directory[2], Tab tabs[3], int win_tab) {
 
 		tabs[i].highlight = 0;
 		tabs[i].linesCounter = 0;
+
+        if(i == 1) {
+            tabs[i].panel_btns = (char**) malloc(sizeof(char*) * OPTNLINES);
+
+            for (int j = 0; j < OPTNLINES; j++) {
+                tabs[i].panel_btns[j] = (char*) malloc(NCOLS);
+                strcpy(tabs[i].panel_btns[j], optionsPanelLines[j]);
+                tabs[i].linesCounter++;
+            }
+        } else {
+            tabs[i].panel_btns = (char**) malloc(sizeof(char*) * NLINES);
+
+            for (int j = 0; j < NLINES; j++) {
+                tabs[i].panel_btns[j] = (char*) malloc(NCOLS);
+                strcpy(tabs[i].panel_btns[j], leftPanelLines[j]);
+                tabs[i].linesCounter++;
+            }
+        }
 	}
-
-	addElem(tabs, LEFT_PANEL, "View mode");
-	addElem(tabs, LEFT_PANEL, "Tree mode");
-	addElem(tabs, LEFT_PANEL, "List mode");
-
-	addElem(tabs, SETTINGS, "option_1");
-	addElem(tabs, SETTINGS, "option_2");
-	addElem(tabs, SETTINGS, "option_3");
-
-	addElem(tabs, RIGHT_PANEL, tabs[LEFT_PANEL].panel_btns[0]);
-	addElem(tabs, RIGHT_PANEL, tabs[LEFT_PANEL].panel_btns[1]);
-	addElem(tabs, RIGHT_PANEL, tabs[LEFT_PANEL].panel_btns[2]);
 
 	redrawSubwindow(directory, win_tab);
 }
