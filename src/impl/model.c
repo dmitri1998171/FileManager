@@ -31,7 +31,6 @@ void scaner(Directory directory[2], int win_tab) {
 	struct dirent *dir_struct_t;
     DIR *dir;
 
-	
 	dir = opendir(directory[win_tab].path);
 	if(dir == NULL) { 
         perror("opendir error!");
@@ -80,6 +79,29 @@ inline void bubbleSort(Entity list[], int size) {
 			}
 		}
 	}
+}
+
+inline void sortList(Directory directory[2], int win_tab) {
+    switch (sort) {
+        case ALPHABET:
+            sortByAlpha(directory, win_tab);
+            break;
+        case TYPE:
+            sortByType(directory, win_tab);
+            break;
+        case SORT_SIZE_MIN:
+            sortBySize(directory, win_tab, true);
+            break;
+        case SORT_SIZE_MAX:
+            sortBySize(directory, win_tab, false);
+            break;
+        case MOD_TIME_MIN:
+            sortByTime(directory, win_tab, true);
+            break;
+        case MOD_TIME_MAX:
+            sortByTime(directory, win_tab, false);
+            break;
+    }
 }
 
 inline void sortByAlpha(Directory directory[2], int win_tab) {

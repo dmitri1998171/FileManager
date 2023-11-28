@@ -101,12 +101,23 @@ enum panel_states {
     HIDE = 3
 };
 
+enum sort_order {
+    ALPHABET = 0,
+    TYPE,
+    SORT_SIZE_MIN,
+    SORT_SIZE_MAX,
+    MOD_TIME_MIN,
+    MOD_TIME_MAX
+};
+
 int panel_state;
+int sort;
 
 // model.c
 void scaner(Directory directory[2], int win_tab);
 int countLines(char **arr, int totalLines);
 void bubbleSort(Entity list[], int size);
+void sortList(Directory directory[2], int win_tab);
 void sortByAlpha(Directory directory[2], int win_tab);
 void sortByType(Directory directory[2], int win_tab);
 void sortBySize(Directory directory[2], int win_tab, bool direction);
@@ -128,7 +139,8 @@ void *progressBar(void *param);
 void init_tabs(Directory directory[2], Tab tabs[3], int win_tab);
 
 // controller.c
-void enterFunc(Directory *directory, int win_tab);
+void hidePanel(Directory directory[2], Tab tabs[3], int win_tab);
+void enterFunc(Directory *directory, Tab tabs[3], int win_tab);
 void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab);
 void showTab(Directory directory[2], Tab tabs[3], int *win_tab);
 

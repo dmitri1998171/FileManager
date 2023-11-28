@@ -12,7 +12,8 @@ int main() {
 
 	ESCDELAY = 0;									// Убирает задержку при нажатии Escape
 	panel_state = HIDE;
-	
+	sort = TYPE;
+
 	pthread_mutex_init(&mutex, NULL);
 	displayFunc(directory, win_tab);				// Инициализируем интерфейс приложения
 	init_tabs(directory, tabs, win_tab);			// Создаем вкладки

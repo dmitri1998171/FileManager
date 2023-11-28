@@ -2,29 +2,84 @@
 
 #define CTRL(x) (x & 0x1F)
 
-void enterFunc(Directory directory[2], int win_tab) {   
-    // Если директория
-    if(directory[win_tab].entity[directory[win_tab].highlight - 1].type == DT_DIR) {
-        chdir(directory[win_tab].entity[directory[win_tab].highlight - 1].name);
-        getcwd(directory[win_tab].path, ARR_SIZE);         // Получ. путь
-        
-        updateSubwindow(directory, win_tab);
+inline void hidePanel(Directory directory[2], Tab tabs[3], int win_tab) {
+    panel_state = HIDE;
 
-        directory[win_tab].highlight = 1;
-    }
+    for(int i = 0; i < 3; i++)
+        hide_panel(tabs[i].panel);
 
-    // Если приложение
-    if(directory[win_tab].entity[directory[win_tab].highlight - 1].type == DT_REG) {
-        pid_t pid = fork();
-        
-        if(pid == 0) {
-            endwin();
-            execl(directory[win_tab].entity[directory[win_tab].highlight - 1].name, directory[win_tab].entity[directory[win_tab].highlight - 1].name, NULL);
-            exit(0);
+    redrawSubwindow(directory, win_tab);
+    printList(directory, win_tab);
+
+    update_panels();
+    doupdate();
+}
+
+void enterFunc(Directory directory[2], Tab tabs[3], int win_tab) {
+    if(panel_state == HIDE) {
+        // Если директория
+        if(directory[win_tab].entity[directory[win_tab].highlight - 1].type == DT_DIR) {
+            chdir(directory[win_tab].entity[directory[win_tab].highlight - 1].name);
+            getcwd(directory[win_tab].path, ARR_SIZE);         // Получ. путь
+            updateSubwindow(directory, win_tab);
+            directory[win_tab].highlight = 1;
         }
 
-        wait(&pid);
-        displayFunc(directory, win_tab);
+        // Если приложение
+        if(directory[win_tab].entity[directory[win_tab].highlight - 1].type == DT_REG) {
+            pid_t pid = fork();
+            
+            if(pid == 0) {
+                endwin();
+                execl(directory[win_tab].entity[directory[win_tab].highlight - 1].name, directory[win_tab].entity[directory[win_tab].highlight - 1].name, NULL);
+                exit(0);
+            }
+
+            wait(&pid);
+            displayFunc(directory, win_tab);
+        }
+    } else {
+        if(panel_state == LEFT_PANEL || panel_state == RIGHT_PANEL) {
+            win_tab = (panel_state == LEFT_PANEL) ? 0 : 1;
+
+            switch (tabs[panel_state].highlight) {
+            // View modes
+                case 0:
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+                    
+            // Sorts
+                case 3:
+                    sort = ALPHABET;
+                    sortList(directory, win_tab);
+                    break;
+                case 4:
+                    sort = TYPE;
+                    sortList(directory, win_tab);
+                    break;
+                case 5:
+                    sort = SORT_SIZE_MIN;
+                    sortList(directory, win_tab);
+                    break;
+                case 6:
+                    sort = SORT_SIZE_MAX;
+                    sortList(directory, win_tab);
+                    break;
+                case 7:
+                    sort = MOD_TIME_MIN;
+                    sortList(directory, win_tab);
+                    break;
+                case 8:
+                    sort = MOD_TIME_MAX;
+                    sortList(directory, win_tab);
+                    break;
+            }
+        }
+
+        hidePanel(directory, tabs, win_tab);
     }
 }
 
@@ -113,24 +168,19 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
             break;
 
         case 10:                                    // Enter button
-            enterFunc(directory, *win_tab);
+            enterFunc(directory, tabs, *win_tab);
             break;
 
         case 27:                                    // Escape button
             if(panel_state == HIDE) {
-                directory[*win_tab].highlight = 1;
-                enterFunc(directory, *win_tab);
+                for (int i = 0; i < directory[*win_tab].counter.total; i++) {
+                    if( ! strcmp(directory[*win_tab].entity[i].name, ".."))
+                        directory[*win_tab].highlight = i + 1;
+                }
+
+                enterFunc(directory, tabs, *win_tab);
             } else {
-                panel_state = HIDE;
-                
-                for(int i = 0; i < 3; i++)
-                    hide_panel(tabs[i].panel);
-
-                redrawSubwindow(directory, *win_tab);
-    			printList(directory, *win_tab);
-
-                update_panels();
-                doupdate();
+                hidePanel(directory, tabs, *win_tab);
             }
 
             break;
@@ -164,7 +214,6 @@ inline void showTab(Directory directory[2], Tab tabs[3], int *win_tab) {
     for(int i = 0; i < 3; i++)
         hide_panel(tabs[i].panel);
 
-    redrawSubwindow(directory, *win_tab);
     show_panel(tabs[panel_state].panel);
     showTabButtons(tabs);
     update_panels();
