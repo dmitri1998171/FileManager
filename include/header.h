@@ -73,6 +73,7 @@ typedef struct Entity_struct {
 }Entity;
 
 typedef struct Directory_struct {
+    int mode;
     EntitiesCounter counter;        // Обшее кол-во сушностей в текущ. директории
     char path[ARR_SIZE];            // Путь к текущ. директории
     Entity *entity;                 // Сущность: папка, файл, ссылка
@@ -110,6 +111,12 @@ enum sort_order {
     MOD_TIME_MAX
 };
 
+enum mode {
+    VIEW_MODE = 0,
+    TREE_MODE,
+    LIST_MODE
+};
+
 int panel_state;
 int sort;
 
@@ -128,9 +135,10 @@ int colornum(int fg, int bg);
 short curs_color(int fg);
 void init_colorpairs();
 void init();
+void viewMode(Directory directory[2], int win_tab);
 void printList(Directory directory[2], int win_tab);
 void showTabButtons(Tab tabs[3]);
-void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w);
+void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w, int mode);
 void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color);
 void displayFunc(Directory directory[2], int win_tab);
 void redrawSubwindow(Directory directory[2], int win_tab);

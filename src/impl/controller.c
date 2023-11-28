@@ -8,8 +8,18 @@ inline void hidePanel(Directory directory[2], Tab tabs[3], int win_tab) {
     for(int i = 0; i < 3; i++)
         hide_panel(tabs[i].panel);
 
-    redrawSubwindow(directory, win_tab);
-    printList(directory, win_tab);
+    if(directory[win_tab].mode == VIEW_MODE) {
+        viewMode(directory, win_tab);
+    }
+    
+    else if(directory[win_tab].mode == TREE_MODE) {
+    
+    }
+
+    else {
+        redrawSubwindow(directory, win_tab);
+        printList(directory, win_tab);
+    }
 
     update_panels();
     doupdate();
@@ -43,12 +53,15 @@ void enterFunc(Directory directory[2], Tab tabs[3], int win_tab) {
             win_tab = (panel_state == LEFT_PANEL) ? 0 : 1;
 
             switch (tabs[panel_state].highlight) {
-            // View modes
+            // Show modes
                 case 0:
+                    directory[win_tab].mode = VIEW_MODE;
                     break;
                 case 1:
+                    directory[win_tab].mode = TREE_MODE;
                     break;
                 case 2:
+                    directory[win_tab].mode = LIST_MODE;
                     break;
                     
             // Sorts
@@ -92,13 +105,33 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
 
     switch(input) {
         case KEY_DOWN:
-            if(panel_state == HIDE) {
-                if(directory[*win_tab].highlight == directory[*win_tab].counter.total)
-                    directory[*win_tab].highlight = 1;
-                else 
-                    ++directory[*win_tab].highlight;  
+            if(panel_state == HIDE) {                
+                if(directory[*win_tab].mode == VIEW_MODE) {
+                    // viewMode(directory, *win_tab);
+                }
                 
-                printList(directory, *win_tab);
+                else if(directory[*win_tab].mode == TREE_MODE) {
+                
+                }
+
+                else {
+                    if(directory[*win_tab].highlight == directory[*win_tab].counter.total)
+                        directory[*win_tab].highlight = 1;
+                    else 
+                        ++directory[*win_tab].highlight;  
+
+                    int inactiveTab = *win_tab ? 0 : 1;
+
+                    if(directory[inactiveTab].mode == VIEW_MODE) {
+                        viewMode(directory, inactiveTab);
+                    }
+                    
+                    if(directory[inactiveTab].mode == TREE_MODE) {
+                    
+                    } 
+
+                    printList(directory, *win_tab);
+                }
             } else {
                 if(tabs[panel_state].highlight == tabs[panel_state].linesCounter - 1)
                     tabs[panel_state].highlight = 0;
@@ -112,12 +145,32 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
 
         case KEY_UP:
             if(panel_state == HIDE) {
-                if(directory[*win_tab].highlight == 1)
-                    directory[*win_tab].highlight = directory[*win_tab].counter.total;
-                else
-                    --directory[*win_tab].highlight;
+                if(directory[*win_tab].mode == VIEW_MODE) {
+                    // viewMode(directory, *win_tab);
+                }
+                
+                else if(directory[*win_tab].mode == TREE_MODE) {
+                
+                }
 
-                printList(directory, *win_tab);
+                else {
+                    if(directory[*win_tab].highlight == 1)
+                        directory[*win_tab].highlight = directory[*win_tab].counter.total;
+                    else
+                        --directory[*win_tab].highlight;
+
+                    int inactiveTab = *win_tab ? 0 : 1;
+
+                    if(directory[inactiveTab].mode == VIEW_MODE) {
+                        viewMode(directory, inactiveTab);
+                    }
+
+                    if(directory[inactiveTab].mode == TREE_MODE) {
+                    
+                    }
+
+                    printList(directory, *win_tab);
+                }
             } else {
                 if(tabs[panel_state].highlight == 0)
                     tabs[panel_state].highlight = tabs[panel_state].linesCounter - 1;

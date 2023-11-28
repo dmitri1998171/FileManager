@@ -169,7 +169,6 @@ void sortByTime(Directory directory[2], int win_tab, bool min) {
 		for (size_t i = 0; i + 1 < directory[win_tab].counter.total; ++i) {
 			char *str = malloc(STR_SIZE);
 			snprintf(str, STR_SIZE, "%s %ld", directory[win_tab].entity[i].name, directory[win_tab].entity[i].modify_time);
-			LOG_STR(LOG_INFO, str)
 
 			for (size_t j = 0; j + 1 < directory[win_tab].counter.total - i; ++j) {
 				if (directory[win_tab].entity[j + 1].modify_time > directory[win_tab].entity[j].modify_time) {

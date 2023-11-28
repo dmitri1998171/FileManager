@@ -64,6 +64,42 @@ inline void init() {
     init_pair(4, COLOR_YELLOW, COLOR_RED);
 }
 
+void readDir(WINDOW* wnd, char* path) {
+    int x = 3, y = 4;
+    char buffer[STR_SIZE + 1];
+    FILE* fd = fopen(path, "r");
+
+    if(fd < 0) {
+        perror("ERROR! Can't open the file!");
+        exit(1);
+    }
+
+    while( fgets(buffer, STR_SIZE, fd) != NULL ) {
+        int size = strlen(buffer);
+        buffer[size] = '\0';
+        mvwprintw(wnd, y, x, "%s", buffer);
+        y++;
+    }
+
+    fclose(fd);
+
+    box(wnd, 0, 0);
+	wrefresh(wnd);
+}
+
+void viewMode(Directory directory[2], int win_tab) {
+    char *str;
+    redrawSubwindow(directory, win_tab);
+
+    int inactiveTab = win_tab ? 0 : 1;
+    if(directory[inactiveTab].entity[ directory[inactiveTab].highlight - 1 ].type == DT_REG) {
+        int size = strlen(directory[inactiveTab].path) + strlen(directory[inactiveTab].entity[ directory[inactiveTab].highlight - 1 ].name) + 2;
+        str = malloc(size);
+        snprintf(str, size, "%s/%s", directory[inactiveTab].path, directory[inactiveTab].entity[ directory[inactiveTab].highlight - 1 ].name);
+        readDir(directory[win_tab].window, str);
+    }
+}
+
 void printList(Directory directory[2], int win_tab) {
 	int x = 2, y = 4;
     char str[MOD_TIME_SIZE];
@@ -125,20 +161,22 @@ void showTabButtons(Tab tabs[3]) {
 	wrefresh(tabs[panel_state].win);
 }
 
-inline void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w) {
+inline void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w, int mode) {
     box(wnd, box_y, box_x);
 	mvwhline(wnd, line_y, line_x, ACS_HLINE, line_w);
 
-    for (int i = line_y + 1; i < LINES - 5; i++) {
-        mvwhline(wnd, i, (COLS/2) - 15, ACS_VLINE, 1);
-        mvwhline(wnd, i, (COLS/2) - 22, ACS_VLINE, 1);
-    }
+    if(mode == LIST_MODE) {
+        for (int i = line_y + 1; i < LINES - 5; i++) {
+            mvwhline(wnd, i, (COLS/2) - 15, ACS_VLINE, 1);
+            mvwhline(wnd, i, (COLS/2) - 22, ACS_VLINE, 1);
+        }
 
-    wattron(wnd, COLOR_PAIR(colornum(6, 8)));
-    mvwprintw(wnd, line_y + 1, (((COLS/2) - 22) / 2) - 2, "Name");
-    mvwprintw(wnd, line_y + 1, (COLS/2) - 20, "Size");
-    mvwprintw(wnd, line_y + 1, (COLS/2) - 12, "Mod time");
-    wattroff(wnd, COLOR_PAIR(colornum(6, 8)));
+        wattron(wnd, COLOR_PAIR(colornum(6, 8)));
+        mvwprintw(wnd, line_y + 1, (((COLS/2) - 22) / 2) - 2, "Name");
+        mvwprintw(wnd, line_y + 1, (COLS/2) - 20, "Size");
+        mvwprintw(wnd, line_y + 1, (COLS/2) - 12, "Mod time");
+        wattroff(wnd, COLOR_PAIR(colornum(6, 8)));
+    }
 }
 
 inline void printTitle(WINDOW *win, int starty, int startx, int width, char string[], chtype color) {	
@@ -188,6 +226,7 @@ void displayFunc(Directory directory[2], int win_tab) {
 
     for (int i = 0; i < 2; i++) {
         directory[i].panel = new_panel(directory[i].window);
+        directory[i].mode = LIST_MODE;
         keypad(directory[i].window, TRUE);
         getcwd(directory[i].path, ARR_SIZE);         // Получ. путь
         updateSubwindow(directory, i);
@@ -201,15 +240,25 @@ void redrawSubwindow(Directory directory[2], int win_tab) {
     printTitle(directory[win_tab].window, 1, 0, COLS/2, directory[win_tab].path, COLOR_PAIR(2));
     wattroff(directory[win_tab].window,  A_BOLD); 
 
-    boxTitle(directory[win_tab].window, 0, 0, 2, 1, (COLS/2) - 2);
+    boxTitle(directory[win_tab].window, 0, 0, 2, 1, (COLS/2) - 2, directory[win_tab].mode);
     wrefresh(directory[win_tab].window);
 }
 
 inline void updateSubwindow(Directory directory[2], int win_tab) {
-    scaner(directory, win_tab);                        // Сканируем директорию
-    sortList(directory, win_tab);                      // Сортировка
-    redrawSubwindow(directory, win_tab);               // Отрисовываем подокно
-    printList(directory, win_tab);	                   // Выводим на экран список файлов
+    if(directory[win_tab].mode == VIEW_MODE) {
+        viewMode(directory, win_tab);
+    }
+    
+    else if(directory[win_tab].mode == TREE_MODE) {
+    
+    }
+
+    else {
+        scaner(directory, win_tab);                        // Сканируем директорию
+        sortList(directory, win_tab);                      // Сортировка
+        redrawSubwindow(directory, win_tab);               // Отрисовываем подокно
+        printList(directory, win_tab);	                   // Выводим на экран список файлов
+    }
 }
 
 void *progressBar(void *param) {
