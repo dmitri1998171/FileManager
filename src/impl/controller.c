@@ -108,6 +108,8 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
             if(panel_state == HIDE) {                
                 if(directory[*win_tab].mode == VIEW_MODE) {
                     // viewMode(directory, *win_tab);
+
+                    
                 }
                 
                 else if(directory[*win_tab].mode == TREE_MODE) {

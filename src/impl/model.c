@@ -67,6 +67,58 @@ void scaner(Directory directory[2], int win_tab) {
 	closedir(dir);
 }
 
+long countLines(char* path) {
+    long counter = 0;
+    char buffer[STR_SIZE + 1];
+
+	FILE* fd = fopen(path, "r");
+
+	if(fd < 0) {
+        perror("ERROR! Can't open the file!");
+        exit(1);
+    }
+
+    while( fgets(buffer, STR_SIZE, fd) != NULL ) {
+        counter++;
+	}
+
+    fclose(fd);
+	return counter;
+};
+
+void readDir(WINDOW* wnd, char* path) {
+    int x = 3, y = 4;
+	long i = 0;
+	long linesCounter = countLines(path);
+
+	ViewMode viewMode;
+	viewMode.highlight = 0;
+	viewMode.lines = malloc(linesCounter);
+
+	for (long i = 0; i < linesCounter; i++)
+		viewMode.lines[i] = malloc(STR_SIZE);
+	
+    FILE* fd = fopen(path, "r");
+
+    if(fd < 0) {
+        perror("ERROR! Can't open the file!");
+        exit(1);
+    }
+
+    while( fgets(viewMode.lines[i], STR_SIZE, fd) != NULL ) {
+        int size = strlen(viewMode.lines[i]);
+        viewMode.lines[i][size] = '\0';
+        mvwprintw(wnd, y, x, "%s", viewMode.lines[i]);
+
+		i++;
+        y++;
+    }
+
+    fclose(fd);
+    box(wnd, 0, 0);
+	wrefresh(wnd);
+}
+
 inline void bubbleSort(Entity list[], int size) {
 	Entity tmp;
 

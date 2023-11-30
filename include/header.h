@@ -90,6 +90,11 @@ typedef struct Tab_struct {
     PANEL  *panel;
 }Tab;
 
+typedef struct view_mode_struct {
+    int highlight;
+    char **lines;
+} ViewMode;
+
 struct pthread_struct {
     char *filename;
     char *pBarName;
@@ -122,7 +127,7 @@ int sort;
 
 // model.c
 void scaner(Directory directory[2], int win_tab);
-int countLines(char **arr, int totalLines);
+void readDir(WINDOW* wnd, char* path);
 void bubbleSort(Entity list[], int size);
 void sortList(Directory directory[2], int win_tab);
 void sortByAlpha(Directory directory[2], int win_tab);

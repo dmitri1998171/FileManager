@@ -64,29 +64,6 @@ inline void init() {
     init_pair(4, COLOR_YELLOW, COLOR_RED);
 }
 
-void readDir(WINDOW* wnd, char* path) {
-    int x = 3, y = 4;
-    char buffer[STR_SIZE + 1];
-    FILE* fd = fopen(path, "r");
-
-    if(fd < 0) {
-        perror("ERROR! Can't open the file!");
-        exit(1);
-    }
-
-    while( fgets(buffer, STR_SIZE, fd) != NULL ) {
-        int size = strlen(buffer);
-        buffer[size] = '\0';
-        mvwprintw(wnd, y, x, "%s", buffer);
-        y++;
-    }
-
-    fclose(fd);
-
-    box(wnd, 0, 0);
-	wrefresh(wnd);
-}
-
 void viewMode(Directory directory[2], int win_tab) {
     char *str;
     redrawSubwindow(directory, win_tab);
