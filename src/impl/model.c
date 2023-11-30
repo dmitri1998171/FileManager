@@ -27,6 +27,14 @@ EntitiesCounter entitiesCount(const char* path) {
 	return counter;
 }
 
+char* pathNameConcat(Directory directory[2], int win_tab) {
+    int inactiveTab = win_tab ? 0 : 1;
+	int size = strlen(directory[inactiveTab].path) + strlen(directory[inactiveTab].entity[ directory[inactiveTab].highlight - 1 ].name) + 2;
+	char *str = malloc(size);
+	snprintf(str, size, "%s/%s", directory[inactiveTab].path, directory[inactiveTab].entity[ directory[inactiveTab].highlight - 1 ].name);
+	return str;
+}
+
 void scaner(Directory directory[2], int win_tab) {
 	struct dirent *dir_struct_t;
     DIR *dir;
@@ -87,15 +95,14 @@ long countLines(char* path) {
 };
 
 void readDir(WINDOW* wnd, char* path) {
-    int x = 3, y = 4;
 	long i = 0;
-	long linesCounter = countLines(path);
 
-	ViewMode viewMode;
-	viewMode.highlight = 0;
-	viewMode.lines = malloc(linesCounter);
+	viewMode.x = X_OFFSET;
+	viewMode.y = Y_OFFSET;
+	viewMode.linesCounter = countLines(path);
+	viewMode.lines = malloc(viewMode.linesCounter);
 
-	for (long i = 0; i < linesCounter; i++)
+	for (long i = 0; i < viewMode.linesCounter; i++)
 		viewMode.lines[i] = malloc(STR_SIZE);
 	
     FILE* fd = fopen(path, "r");
@@ -108,15 +115,11 @@ void readDir(WINDOW* wnd, char* path) {
     while( fgets(viewMode.lines[i], STR_SIZE, fd) != NULL ) {
         int size = strlen(viewMode.lines[i]);
         viewMode.lines[i][size] = '\0';
-        mvwprintw(wnd, y, x, "%s", viewMode.lines[i]);
 
 		i++;
-        y++;
     }
 
     fclose(fd);
-    box(wnd, 0, 0);
-	wrefresh(wnd);
 }
 
 inline void bubbleSort(Entity list[], int size) {

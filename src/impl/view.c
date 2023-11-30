@@ -64,16 +64,24 @@ inline void init() {
     init_pair(4, COLOR_YELLOW, COLOR_RED);
 }
 
-void viewMode(Directory directory[2], int win_tab) {
-    char *str;
+void drawText(Directory directory[2], int win_tab) {
+    int x = X_OFFSET, y = Y_OFFSET;
+    for (long i = 0; i < viewMode.linesCounter; i++) {
+        mvwprintw(directory[win_tab].window, y++, x, "%s", viewMode.lines[i]);
+        mvwaddch(directory[win_tab].window, viewMode.y, viewMode.x, ' ' | COLOR_PAIR(2) | A_BLINK);
+    }
+
+    box(directory[win_tab].window, 0, 0);
+    wrefresh(directory[win_tab].window);
+}
+
+void viewModeFunc(Directory directory[2], int win_tab) {
     redrawSubwindow(directory, win_tab);
 
     int inactiveTab = win_tab ? 0 : 1;
     if(directory[inactiveTab].entity[ directory[inactiveTab].highlight - 1 ].type == DT_REG) {
-        int size = strlen(directory[inactiveTab].path) + strlen(directory[inactiveTab].entity[ directory[inactiveTab].highlight - 1 ].name) + 2;
-        str = malloc(size);
-        snprintf(str, size, "%s/%s", directory[inactiveTab].path, directory[inactiveTab].entity[ directory[inactiveTab].highlight - 1 ].name);
-        readDir(directory[win_tab].window, str);
+        readDir(directory[win_tab].window, pathNameConcat(directory, win_tab));
+        drawText(directory, win_tab);
     }
 }
 
@@ -223,7 +231,7 @@ void redrawSubwindow(Directory directory[2], int win_tab) {
 
 inline void updateSubwindow(Directory directory[2], int win_tab) {
     if(directory[win_tab].mode == VIEW_MODE) {
-        viewMode(directory, win_tab);
+        viewModeFunc(directory, win_tab);
     }
     
     else if(directory[win_tab].mode == TREE_MODE) {

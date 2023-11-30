@@ -9,7 +9,7 @@ inline void hidePanel(Directory directory[2], Tab tabs[3], int win_tab) {
         hide_panel(tabs[i].panel);
 
     if(directory[win_tab].mode == VIEW_MODE) {
-        viewMode(directory, win_tab);
+        viewModeFunc(directory, win_tab);
     }
     
     else if(directory[win_tab].mode == TREE_MODE) {
@@ -107,9 +107,13 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
         case KEY_DOWN:
             if(panel_state == HIDE) {                
                 if(directory[*win_tab].mode == VIEW_MODE) {
-                    // viewMode(directory, *win_tab);
+                    if(viewMode.y < viewMode.linesCounter) {
+                        viewMode.y++;
 
-                    
+                        if(viewMode.x > strlen(viewMode.lines[viewMode.y - Y_OFFSET]))
+                            viewMode.x = strlen(viewMode.lines[viewMode.y - Y_OFFSET]) + 2;
+                        drawText(directory, *win_tab);
+                    }
                 }
                 
                 else if(directory[*win_tab].mode == TREE_MODE) {
@@ -125,7 +129,7 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
                     int inactiveTab = *win_tab ? 0 : 1;
 
                     if(directory[inactiveTab].mode == VIEW_MODE) {
-                        viewMode(directory, inactiveTab);
+                        viewModeFunc(directory, inactiveTab);
                     }
                     
                     if(directory[inactiveTab].mode == TREE_MODE) {
@@ -148,7 +152,13 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
         case KEY_UP:
             if(panel_state == HIDE) {
                 if(directory[*win_tab].mode == VIEW_MODE) {
-                    // viewMode(directory, *win_tab);
+                    if(viewMode.y > Y_OFFSET) {
+                        viewMode.y--;
+
+                        if(viewMode.x > strlen(viewMode.lines[viewMode.y - Y_OFFSET]))
+                            viewMode.x = strlen(viewMode.lines[viewMode.y - Y_OFFSET]) + 2;
+                        drawText(directory, *win_tab);
+                    }
                 }
                 
                 else if(directory[*win_tab].mode == TREE_MODE) {
@@ -164,7 +174,7 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
                     int inactiveTab = *win_tab ? 0 : 1;
 
                     if(directory[inactiveTab].mode == VIEW_MODE) {
-                        viewMode(directory, inactiveTab);
+                        viewModeFunc(directory, inactiveTab);
                     }
 
                     if(directory[inactiveTab].mode == TREE_MODE) {
@@ -180,6 +190,28 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
                     --tabs[panel_state].highlight;
 
                 showTabButtons(tabs);
+            }
+
+            break;
+
+        case KEY_LEFT:
+            if(panel_state == HIDE) {
+                if(directory[*win_tab].mode == VIEW_MODE) {
+                    if(viewMode.x > X_OFFSET)
+                        viewMode.x--;
+                        drawText(directory, *win_tab);
+                }
+            }
+
+            break;
+
+        case KEY_RIGHT:
+            if(panel_state == HIDE) {
+                if(directory[*win_tab].mode == VIEW_MODE) {
+                    if(viewMode.x <= strlen(viewMode.lines[viewMode.y - Y_OFFSET]) + 1) 
+                        viewMode.x++;
+                        drawText(directory, *win_tab);
+                }
             }
 
             break;

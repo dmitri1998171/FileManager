@@ -52,6 +52,8 @@
 #define STR_SIZE 255
 #define ARR_SIZE 1024
 #define BUFF_SIZE 5    // Кол-во байт, считываемых за раз 
+#define X_OFFSET 3
+#define Y_OFFSET 4
 
 pthread_t tid1, tid2;
 pthread_mutex_t mutex;
@@ -91,7 +93,9 @@ typedef struct Tab_struct {
 }Tab;
 
 typedef struct view_mode_struct {
-    int highlight;
+    int x;
+    long y;
+    long linesCounter;
     char **lines;
 } ViewMode;
 
@@ -124,8 +128,10 @@ enum mode {
 
 int panel_state;
 int sort;
+ViewMode viewMode;
 
 // model.c
+char* pathNameConcat(Directory directory[2], int win_tab);
 void scaner(Directory directory[2], int win_tab);
 void readDir(WINDOW* wnd, char* path);
 void bubbleSort(Entity list[], int size);
@@ -140,7 +146,8 @@ int colornum(int fg, int bg);
 short curs_color(int fg);
 void init_colorpairs();
 void init();
-void viewMode(Directory directory[2], int win_tab);
+void drawText(Directory directory[2], int win_tab);
+void viewModeFunc(Directory directory[2], int win_tab);
 void printList(Directory directory[2], int win_tab);
 void showTabButtons(Tab tabs[3]);
 void boxTitle(WINDOW *wnd, int box_x, int box_y, int line_y, int line_x, int line_w, int mode);
