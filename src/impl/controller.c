@@ -286,6 +286,16 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
             panel_state = RIGHT_PANEL;
             showTab(directory, tabs, win_tab);
             break;
+
+        default:                                    // Symbol's insertion
+            if(directory[*win_tab].mode == VIEW_MODE) {
+                char symbol = input;
+                append(viewMode.lines[viewMode.y - Y_OFFSET], symbol, viewMode.x - X_OFFSET);
+                mvwprintw(directory[*win_tab].window, viewMode.y, X_OFFSET, viewMode.lines[viewMode.y - Y_OFFSET]);
+                viewMode.x++;
+            }
+
+            break;
     }
 
     // Shortcuts

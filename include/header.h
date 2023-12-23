@@ -33,7 +33,7 @@
 	#define LOG_CHAR(log_level, x)   	    \
         ( (log_level == LOG_DEBUG) ? 		\
             (fprintf(fdw, "%s | %s():%d | %s | %s= %c\n", __FILE__, __FUNCTION__, __LINE__, #log_level, #x, x)) :\
-            (fprintf(fdw, "%s\n", x)) );	
+            (fprintf(fdw, "%c\n", x)) );	
 
 	#define LOG_STR(log_level, x)   	    \
         ( (log_level == LOG_DEBUG) ? 		\
@@ -133,6 +133,7 @@ ViewMode viewMode;
 // model.c
 char* pathNameConcat(Directory directory[2], int win_tab);
 void scaner(Directory directory[2], int win_tab);
+void append(char subject[], char insert, int pos);
 void readDir(WINDOW* wnd, char* path);
 void bubbleSort(Entity list[], int size);
 void sortList(Directory directory[2], int win_tab);

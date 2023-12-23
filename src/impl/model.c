@@ -75,6 +75,22 @@ void scaner(Directory directory[2], int win_tab) {
 	closedir(dir);
 }
 
+void append(char subject[], char symbol, int pos) {
+	char *insert = malloc(1);
+	*insert = symbol;
+
+	char *buf = (char*)malloc(strlen(subject) + strlen(insert) + 1);
+
+    strncpy(buf, subject, pos); 			// copy at most first pos characters
+    int len = strlen(buf);
+    strcpy(buf + len, insert); 				// copy all of insert[] at the end
+    len += strlen(insert);  				// increase the length by length of insert[]
+    strcpy(buf + len, subject + pos); 		// copy the rest
+
+    strcpy(subject, buf);   				// copy it back to subject
+	free(buf);
+}
+
 long countLines(char* path) {
     long counter = 0;
     char buffer[STR_SIZE + 1];
