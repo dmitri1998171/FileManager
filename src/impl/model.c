@@ -96,6 +96,21 @@ void deletechar(char *str,int pos){
 		str[i] = str[i + 1];
 }
 
+void saveViewMode(char* path) {
+    FILE* fd = fopen(path, "w");
+	
+	if(fd < 0) {
+        perror("ERROR! Can't open the file!");
+        exit(1);
+    }
+
+	for (int i = 0; i < viewMode.linesCounter; i++) {
+		fwrite(viewMode.lines[i], strlen(viewMode.lines[i]), 1, fd);
+	}
+
+    fclose(fd);
+}
+
 long countLines(char* path) {
     long counter = 0;
     char buffer[STR_SIZE + 1];

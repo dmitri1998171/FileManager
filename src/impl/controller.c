@@ -291,6 +291,13 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
 
             break;
 
+        case '+':
+            if(directory[*win_tab].mode == VIEW_MODE) {
+                saveViewMode(pathNameConcat(directory, *win_tab));
+            }
+
+            break;
+
         case '1':                                   // Left panel tab
             panel_state = LEFT_PANEL;
             showTab(directory, tabs, win_tab);
@@ -323,7 +330,7 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
     
     if(input == CTRL('d')) 
         directory[*win_tab].highlight = directory[*win_tab].counter.total;
-
+    
 }
 
 inline void showTab(Directory directory[2], Tab tabs[3], int *win_tab) {
