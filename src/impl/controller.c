@@ -246,6 +246,25 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
             updateSubwindow(directory, 1);
             break;
 
+        case 127:                                   // Backspace
+            if(directory[*win_tab].mode == VIEW_MODE) {
+                if(viewMode.x == X_OFFSET && viewMode.y > Y_OFFSET) {
+                    viewMode.x = strlen(viewMode.lines[viewMode.y - Y_OFFSET]);
+                    deletechar(viewMode.lines[viewMode.y - Y_OFFSET - 1], viewMode.x);
+                    mvwprintw(directory[*win_tab].window, viewMode.y, X_OFFSET, viewMode.lines[viewMode.y - Y_OFFSET]);
+                    mvwprintw(directory[*win_tab].window, viewMode.y - 1, X_OFFSET, viewMode.lines[viewMode.y - 1 - Y_OFFSET]);
+                    viewMode.y--;
+                } 
+                else if(viewMode.x > X_OFFSET && viewMode.y >= Y_OFFSET) {
+                    deletechar(viewMode.lines[viewMode.y - Y_OFFSET], viewMode.x - X_OFFSET - 1);
+                    mvwprintw(directory[*win_tab].window, viewMode.y, X_OFFSET, viewMode.lines[viewMode.y - Y_OFFSET]);
+                    viewMode.x--;
+                }
+
+                mvwaddch(directory[*win_tab].window, viewMode.y, viewMode.x, ' ' | COLOR_PAIR(2) | A_BLINK);
+            }
+            break;
+
         case 9:                                     // Tab button
             *win_tab += 1;
 

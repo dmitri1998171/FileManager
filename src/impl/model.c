@@ -91,6 +91,11 @@ void append(char subject[], char symbol, int pos) {
 	free(buf);
 }
 
+void deletechar(char *str,int pos){
+	for(int i = pos; i < strlen(str); ++i)
+		str[i] = str[i + 1];
+}
+
 long countLines(char* path) {
     long counter = 0;
     char buffer[STR_SIZE + 1];

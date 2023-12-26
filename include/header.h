@@ -134,6 +134,7 @@ ViewMode viewMode;
 char* pathNameConcat(Directory directory[2], int win_tab);
 void scaner(Directory directory[2], int win_tab);
 void append(char subject[], char insert, int pos);
+void deletechar(char *str,int pos);
 void readDir(WINDOW* wnd, char* path);
 void bubbleSort(Entity list[], int size);
 void sortList(Directory directory[2], int win_tab);
