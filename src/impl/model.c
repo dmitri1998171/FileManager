@@ -28,10 +28,10 @@ EntitiesCounter entitiesCount(const char* path) {
 }
 
 char* pathNameConcat(Directory directory[2], int win_tab) {
-    int inactiveTab = win_tab ? 0 : 1;
-	int size = strlen(directory[inactiveTab].path) + strlen(directory[inactiveTab].entity[ directory[inactiveTab].highlight - 1 ].name) + 2;
+    // int inactiveTab = win_tab ? 0 : 1;
+	int size = strlen(directory[win_tab].path) + strlen(directory[win_tab].entity[ directory[win_tab].highlight - 1 ].name) + 2;
 	char *str = malloc(size);
-	snprintf(str, size, "%s/%s", directory[inactiveTab].path, directory[inactiveTab].entity[ directory[inactiveTab].highlight - 1 ].name);
+	snprintf(str, size, "%s/%s", directory[win_tab].path, directory[win_tab].entity[ directory[win_tab].highlight - 1 ].name);
 	return str;
 }
 

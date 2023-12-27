@@ -163,7 +163,7 @@ void init_tabs(Directory directory[2], Tab tabs[3], int win_tab);
 
 // controller.c
 void hidePanel(Directory directory[2], Tab tabs[3], int win_tab);
-void enterFunc(Directory *directory, Tab tabs[3], int win_tab);
+void enterFunc(Directory directory[2], Tab tabs[3], int win_tab);
 void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab);
 void showTab(Directory directory[2], Tab tabs[3], int *win_tab);
 

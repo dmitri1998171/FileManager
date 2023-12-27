@@ -80,7 +80,7 @@ void viewModeFunc(Directory directory[2], int win_tab) {
 
     int inactiveTab = win_tab ? 0 : 1;
     if(directory[inactiveTab].entity[ directory[inactiveTab].highlight - 1 ].type == DT_REG) {
-        readDir(directory[win_tab].window, pathNameConcat(directory, win_tab));
+        readDir(directory[win_tab].window, pathNameConcat(directory, inactiveTab));
         drawText(directory, win_tab);
     }
 }

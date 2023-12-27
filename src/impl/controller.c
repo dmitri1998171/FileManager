@@ -29,8 +29,8 @@ void enterFunc(Directory directory[2], Tab tabs[3], int win_tab) {
     if(panel_state == HIDE) {
         // Если директория
         if(directory[win_tab].entity[directory[win_tab].highlight - 1].type == DT_DIR) {
-            chdir(directory[win_tab].entity[directory[win_tab].highlight - 1].name);
-            getcwd(directory[win_tab].path, ARR_SIZE);         // Получ. путь
+            chdir(pathNameConcat(directory, win_tab));          // change a directory
+            getcwd(directory[win_tab].path, ARR_SIZE);          // Get a path
             updateSubwindow(directory, win_tab);
             directory[win_tab].highlight = 1;
         }
@@ -112,6 +112,7 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
 
                         if(viewMode.x > strlen(viewMode.lines[viewMode.y - Y_OFFSET]))
                             viewMode.x = strlen(viewMode.lines[viewMode.y - Y_OFFSET]) + 2;
+
                         drawText(directory, *win_tab);
                     }
                 }
@@ -125,6 +126,10 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
                         directory[*win_tab].highlight = 1;
                     else 
                         ++directory[*win_tab].highlight;  
+
+                    // LOG_STR(LOG_DEBUG, directory[0].entity[directory[0].highlight - 1].name)
+                    // LOG_STR(LOG_DEBUG, directory[1].entity[directory[1].highlight - 1].name)
+                    // LOG_NUM(LOG_DEBUG, *win_tab)
 
                     int inactiveTab = *win_tab ? 0 : 1;
 
@@ -278,15 +283,17 @@ void switchFunc(Directory directory[2], Tab tabs[3], int *cycle, int *win_tab) {
             break;
 
         case 27:                                    // Escape button
-            if(panel_state == HIDE) {
-                for (int i = 0; i < directory[*win_tab].counter.total; i++) {
-                    if( ! strcmp(directory[*win_tab].entity[i].name, ".."))
-                        directory[*win_tab].highlight = i + 1;
-                }
+            if(directory[*win_tab].mode != VIEW_MODE) {
+                if(panel_state == HIDE) {
+                    for (int i = 0; i < directory[*win_tab].counter.total; i++) {
+                        if( ! strcmp(directory[*win_tab].entity[i].name, ".."))
+                            directory[*win_tab].highlight = i + 1;
+                    }
 
-                enterFunc(directory, tabs, *win_tab);
-            } else {
-                hidePanel(directory, tabs, *win_tab);
+                    enterFunc(directory, tabs, *win_tab);
+                } else {
+                    hidePanel(directory, tabs, *win_tab);
+                }
             }
 
             break;
